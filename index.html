@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leaves before the frost</title>
+<meta name="description" content="422,000 men marched into Russia in 1812. Four in five vanished before the first frost. A redrawing of Minard’s chart, one leaf for every 10,000 men.">
+<link rel="canonical" href="https://giorgiat91.github.io/minard/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Leaves before the frost">
+<meta property="og:description" content="422,000 men marched into Russia in 1812. Four in five vanished before the first frost. A redrawing of Minard’s chart, one leaf for every 10,000 men.">
+<meta property="og:url" content="https://giorgiat91.github.io/minard/">
+<meta property="og:image" content="https://giorgiat91.github.io/minard/anteprima.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A plant losing its leaves inside a calendar ring: each leaf is 10,000 men of Napoleon’s army in 1812.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Martel+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FFFFFF;
+    --ink: #2B2620;
+    --ink-muted: #6E665B;
+    --rule: #D9D2C3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Martel Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  main {
+    max-width: 632px;
+    margin: 0 auto;
+    padding: 16px 16px 32px;
+  }
+  /* capitoli (decisioni del 2 novembre): una riga di date sotto i controlli, fuori dalla scena.
+     Testo semplice senza bordo; il capitolo in corso è inchiostro e grassetto, gli altri muted.
+     Su telefono le date vanno a capo dentro .chapters-list: la seconda riga parte sotto la
+     prima data (24 Jun) e forma una colonna con la prima; l'etichetta "Key moments:" resta a
+     sinistra della prima riga. Su desktop etichetta + date stanno su una riga, centrata.
+     Etichetta e date sono allineate sulla linea di base del testo (align-items: baseline). */
+  #chapters {
+    --chapter-tap: 44px;        /* altezza dell'area di tocco di ogni capitolo */
+    --chapter-row-overlap: 6px; /* telefono: quanto le aree di tocco di due righe si sovrappongono (per lato) */
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    max-width: 600px;
+    margin: 4px auto 0;
+    font-size: 0.85rem;     /* ≈ 13,6 px: mai sotto i 12 px */
+  }
+  #chapters[hidden], body.video #chapters { display: none; }
+  #chapters .chapters-label {
+    flex: none;
+    color: var(--ink-muted);
+    font-weight: 400;
+    margin-right: 4px;
+  }
+  #chapters .chapters-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 2px;
+    min-width: 0;           /* può stringersi sotto la larghezza di una riga sola: allora va a capo */
+  }
+  #chapters button {
+    font: inherit;
+    font-weight: 400;
+    color: var(--ink-muted);
+    background: transparent;
+    border: 0;
+    min-height: var(--chapter-tap);   /* area di tocco comoda sul telefono */
+    padding: 0 8px;
+    cursor: pointer;
+    /* colonna: sotto il testo una copia invisibile in grassetto riserva la larghezza,
+       così la riga non cambia quando il grassetto passa da un capitolo all'altro */
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  #chapters button::after {
+    content: attr(data-label);
+    font-weight: 600;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+  }
+  #chapters button[aria-current="true"] { color: var(--ink); font-weight: 600; }
+  #chapters button:hover,
+  #chapters button:focus-visible {
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+    outline: none;
+  }
+  /* righe più vicine quando la riga va a capo (telefono): ogni pulsante resta alto 44 px ma
+     occupa 44 − 2 × overlap px nella riga, quindi le aree di tocco di due righe vicine si
+     sovrappongono di 2 × overlap. Il margine della lista restituisce lo spazio sopra la prima
+     riga e sotto l'ultima: con una riga sola (desktop) l'impaginazione è identica a prima. */
+  #chapters .chapters-list { margin-block: var(--chapter-row-overlap); }
+  #chapters button { margin-block: calc(-1 * var(--chapter-row-overlap)); }
+  /* controlli sotto la scena: play/pausa e cursore del tempo (non compaiono nel video) */
+  #timeline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 600px;
+    margin: 8px auto 0;
+  }
+  #timeline[hidden], body.video #timeline { display: none; }
+  #play {
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--paper);
+    background: var(--ink);
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    padding: 6px 0 4px;
+    min-width: 5.5em;
+    cursor: pointer;
+  }
+  #play:focus-visible, #timeline input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  #timeline input { flex: 1; min-width: 0; accent-color: var(--ink); cursor: pointer; }
+  #timeline output {
+    font-weight: 600;
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+    min-width: 6.5em;
+    text-align: right;
+  }
+  /* la scena: formato fisso 4:5 (viewBox 560 × 700) */
+  svg { display: block; width: 100%; max-width: 600px; height: auto; margin: 0 auto; }
+  svg text { font-family: inherit; fill: var(--ink); }
+  .muted { fill: var(--ink-muted); }
+  footer {
+    font-weight: 300;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    text-align: center;
+    margin-top: 8px;
+  }
+  #error {
+    background: #F3E3D3;
+    border: 1px solid #844716;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    margin: 12px 0;
+  }
+</style>
+</head>
+<body>
+<main>
+  <div id="error" hidden></div>
+  <svg id="chart" role="img" aria-labelledby="chart-desc">
+    <desc id="chart-desc">A plant with three branches inside a calendar ring. Each leaf is 10,000 men. Fallen leaves form a carpet on the ground, from left to right in the order they fell: Summer, Autumn, Frozen autumn.</desc>
+  </svg>
+  <div id="timeline">
+    <button id="play" type="button">Play</button>
+    <input id="day" type="range" min="0" max="173" step="1" value="0" aria-label="Day of the campaign">
+    <output id="day-label" for="day"></output>
+  </div>
+  <nav id="chapters" aria-label="Key moments">
+    <span class="chapters-label" aria-hidden="true">Key moments:</span>
+    <div class="chapters-list"></div>
+  </nav>
+  <footer>1 leaf = 10,000 men (rounded). Km follow the main army as the crow flies between Minard’s points: the real march was longer. Some dates are estimates. Data: Minard (1869), via HistData.</footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+// =====================================================================
+// SETTINGS: tutti i parametri visivi in un unico posto
+// =====================================================================
+const SETTINGS = {
+  // file di dati (percorsi relativi a output/index.html, serve Live Server)
+  files: {
+    fiore: "data/fiore_giornaliero.csv",
+    caduti: "data/petali_caduti.csv",
+    tappe: "data/minard_tappe.csv",
+  },
+
+  // i tre fotogrammi della V1: non hanno più pulsanti, servono solo a ?frame=0|1|2
+  // nell'indirizzo (test e video), come ?day=0…173
+  frames: [
+    { date: "1812-06-24", label: "24 Jun" },
+    { date: "1812-09-14", label: "14 Sep" },
+    { date: "1812-12-14", label: "14 Dec" },
+  ],
+  startFrame: 0,
+  // capitoli (decisioni del 2 novembre): un pulsante per ogni nota di SETTINGS.notes, sotto i
+  // controlli. Giorno ed etichetta ("24 Jun") si ricavano dal campo "from" della nota.
+  // Al clic: pausa e salto allo stato del giorno, come con il cursore. Nascosti con ?video=1.
+  showChapters: true,
+  chapters: { ariaPrefix: "Jump to " },
+  // controlli sotto la scena (play/pausa e cursore del tempo): sempre visibili, tranne con ?video=1
+  showSlider: true,
+
+  // animazione (design-spec §3 e §5, decisioni del 22 ottobre). Tempi in millisecondi.
+  // Le animazioni delle foglie hanno tempi propri: possono continuare mentre i giorni avanzano.
+  animation: {
+    dayMs: 200,               // un giorno del calendario (174 giorni ≈ 35 s)
+    slowdown: [1.5, 2.5],     // penultimo e ultimo giorno prima di una nota: 0,3 s e 0,5 s
+    autoStartMs: 4000,        // partenza automatica dopo che la scena è entrata in vista
+    autoStartVisible: 0.5,    // "in vista" = metà della scena (o metà della finestra) visibile
+    maxFrameMs: 100,          // salto massimo dell'orologio tra due fotogrammi (scheda in secondo piano)
+    // pausa = base + parole, min 2,5 s (27 ottobre; nella V11 1,5 s + 0,3 s per parola, min 3 s)
+    note: { fadeMs: 300, baseMs: 1000, perWordMs: 250, minMs: 2500 },
+    finale: { afterMs: 500, finalNoteMs: 2500 },   // 14 dicembre: ricomposizione, 0,5 s, N7, 2,5 s, nota finale
+    // caduta: durata, sfalsamento tra foglie dello stesso giorno, dondolio (ampiezza in unità
+    // del viewBox, numero di oscillazioni, rotazione massima del dondolio in gradi)
+    fall: { ms: 1200, staggerMs: 150, sway: 7, swings: 2, spin: 18 },
+    // 23 settembre: le foglie diventano marroni una per una, in ordine casuale ma fisso (seed),
+    // distribuite su "ms"; ogni foglia passa da verde a marrone in "leafMs" (27 ottobre)
+    autumn: { ms: 1500, leafMs: 200, seed: 7 },
+    // 9 novembre: la brina arriva foglia per foglia, come l'autunno, con un altro seme, su "ms";
+    // ogni foglia in "leafMs": prima colore e bordo interno, poi i puntini (27 ottobre).
+    // Le foglie che cadono quel giorno partono quando tutta la chioma è brinata.
+    frost: { ms: 1000, leafMs: 300, seed: 11 },
+    migration: { ms: 1400, staggerMs: 200, arcLift: 60 },   // 26 novembre, ad arco sulla guida
+    recompose: { ms: 2000, arcLift: 60 },                   // 14 dicembre, sulla mezza foglia
+    branchTraceMs: 300,       // il ramo spoglio diventa traccia dopo che le foglie sono volate via
+    reducedFadeMs: 300,       // prefers-reduced-motion: dissolvenze al posto dei voli
+  },
+
+  // note dei momenti (design-spec §4, "Testi delle annotazioni nella versione finale"):
+  // ognuna si vede dal giorno "from" al giorno "to" compresi (date come in
+  // fiore_giornaliero.csv). Ogni nota compare solo nel suo giorno (from = to); negli altri
+  // giorni la colonna è vuota. Il tempo di lettura lo darà l'animazione, fermandosi su quel
+  // giorno. "text" = paragrafi (uno o più).
+  // Testi scelti il 22 ottobre (tutti ✓); N7 è seguita dalla nota finale sull'inverno.
+  // "timing" (animazione, design-spec §3): "afterEvent" (se manca) = prima l'evento del giorno,
+  // poi la nota; "withEvent" = la nota compare appena scatta il giorno, insieme all'evento, e la
+  // riproduzione riparte quando sono finiti sia il tempo di lettura sia le animazioni (27 ottobre).
+  notes: [
+    { id: "N1", from: "1812-06-24", to: "1812-06-24",
+      text: ["The march into Russia begins."] },
+    { id: "N2", from: "1812-07-28", to: "1812-07-28",
+      text: ["By late July, more than one man in three has vanished. No great battle yet: sickness, heat, hunger."] },
+    { id: "N3", from: "1812-09-07", to: "1812-09-07",
+      text: ["The great battle takes three leaves. The march had taken 24."] },
+    { id: "N4", from: "1812-09-23", to: "1812-09-23",
+      text: ["Summer ends in Moscow. Two men in three are already gone."] },
+    { id: "N5", from: "1812-11-09", to: "1812-11-09", timing: "withEvent",
+      text: ["First frost, −11 °C. 34 of 42 leaves had already fallen."] },   // "−11 °C" non va a capo
+    { id: "N6", from: "1812-11-26", to: "1812-11-26", timing: "withEvent",
+      text: ["30,000 men join at the Berezina. After the crossing, the main army counts 20,000."] },
+    { id: "N7", from: "1812-12-14", to: "1812-12-14",
+      text: ["4,000 back from Moscow, 6,000 who never went: the last leaf.",
+             "Eight days later, on 22 Dec, winter began."] },
+  ],
+
+  // scala uomini → segni
+  menPerLeaf: 10000,
+
+  // palette B · Terra di Siena (design-spec.md)
+  colors: {
+    paper: "#FFFFFF",       // sfondo bianco dal 29 ottobre (V16; prima crema #FAF7F0)
+    ink: "#2B2620",
+    inkMuted: "#6E665B",
+    track: "#E9E3D7",     // anello non ancora percorso
+    verde: "#589A3C",
+    marrone: "#844716",
+    gelo: "#D2A679",      // frozen autumn: marrone chiaro, sempre con la brina (design-spec §6)
+    frost: "#FFFFFF",     // brina: bordo interno e puntini della foglia gelata
+    frostOutline: "#9A6B3E", // contorno sottile della foglia gelata (si stacca dallo sfondo)
+    rule: "#CFC6B5",      // linea sottile tra parte fissa e parte che cambia
+    branchTrace: "#A39783", // ramo laterale spoglio dopo il ricongiungimento (contrasto 2,9:1 con lo sfondo bianco)
+    markTrace: "#958B7B",   // etichette e tacche dell'anello dopo il loro momento (contrasto 3,4:1)
+  },
+
+  // nomi dei tratti del tappeto a terra (testi visibili in inglese); nei dati la chiave resta "gelo"
+  seasonNames: { verde: "Summer", marrone: "Autumn", gelo: "Frozen autumn" },
+
+  // scena in formato 4:5 (unità del viewBox)
+  width: 560,
+  height: 700,
+
+  // testi: dimensione in unità del viewBox, mai sotto minTextPx sullo schermo
+  minTextPx: 12,
+  // counter = numero degli uomini (grande), counterSmall = numero dei km (più piccolo)
+  // ring / ringDate: nome e data delle etichette dell'anello (data circa 15% più piccola)
+  text: { title: 32, subtitle: 14, date: 22, counter: 26, counterSmall: 18, counterLabel: 13,
+          ring: 13, ringDate: 11, carpetSub: 13,
+          note: 15 },   // 15 se tutte le note stanno nella colonna su desktop, altrimenti 14 per tutte
+  // solo con ?video=1 (design-spec §7, 27 ottobre): note più grandi per il feed del telefono.
+  // 17 è il massimo che sta nella colonna: a 18 la N7 arriva sull'etichetta Smolensk
+  video: { note: 17 },
+  // Le righe dell'intestazione sono impilate una sotto l'altra (titolo, sottotitolo,
+  // linea, data, contatori): se il sottotitolo va a capo, tutto scende di conseguenza.
+  // La data sta da sola al centro; sotto la sua riga i contatori, separati sulla stessa riga:
+  // uomini a sinistra (margine "left"), km a destra (margine "right"). Impaginazione A.
+  // rulePadPx: aria sopra e sotto la linea che separa la parte fissa da quella che cambia.
+  // minGapPx: spazio minimo sullo schermo tra intestazione ed etichetta "Niemen".
+  // Se manca (telefoni stretti), la scena sotto l'intestazione scende e diventa più alta del 4:5.
+  header: { x: 280, left: 20, right: 540, titleY: 33, maxWidth: 520,
+            rulePadPx: 6, ruleWidth: 80, minGapPx: 8 },
+
+  // etichette dei contatori (design-spec.md, "Impaginazione A", 22 ottobre)
+  counterLabels: {
+    men: "men still marching",
+    km: "km from the Niemen",
+    kmSub: "main army",               // non mostrato quando la distanza è 0 (24 giugno)
+  },
+
+  // colonna delle note a destra dell'albero (impaginazione A): linea verticale sottile in
+  // "x", testo da x + padLeft fino a x + width. In verticale va da sotto l'intestazione
+  // (gapTop) fino sopra la prima etichetta dell'anello che le sta sotto (gapBottom).
+  // Se sullo schermo il testo della colonna sarebbe più stretto di minPx, la nota va a tutta
+  // larghezza sotto i contatori (telefoni) e la scena non si sposta (scene.shiftX vale solo
+  // con la colonna). lineHeight e paragraphGap in em del testo delle note.
+  noteColumn: { x: 412, width: 128, padLeft: 10, gapTop: 10, gapBottom: 6, minPx: 110,
+                lineHeight: 1.3, paragraphGap: 0.6, ruleWidth: 1,
+                fullGapTop: 10 },   // telefoni: aria tra contatori e nota a tutta larghezza
+
+  // scena (anello, pianta, etichette dell'anello): spostamento orizzontale quando c'è la
+  // colonna delle note. Terreno, tappeto e legenda non si spostano.
+  scene: { shiftX: -50 },
+
+  // testi fissi (provvisori, BRIEF.md 17 ottobre)
+  title: "Leaves before the frost",
+  // sottotitolo: una frase per riga (design-spec §4, "Impaginazione dei testi"); se una frase
+  // non sta in una riga (telefono) va a capo normalmente
+  subtitle: ["422,000 men marched into Russia in 1812.",
+             "Four in five vanished before the first frost."],
+
+  // UNA sola foglia per pianta e terreno: 1 foglia = 10.000 uomini
+  // breakDepth: profondità del bordo spezzato della mezza foglia
+  leaf: { length: 34, width: 10, breakDepth: 1.4 },
+
+  ring: {
+    // spostato a destra: a sinistra servono le etichette dell'anello
+    // (con la colonna delle note tutta la scena si sposta di scene.shiftX)
+    cx: 300, cy: 340,
+    radius: 138,
+    thickness: 14,
+    // cursore della data (C3): punta di freccia color inchiostro alla fine del tratto
+    // percorso, orientata in senso orario. length = lungo l'anello, width = di traverso
+    cursor: { length: 11, width: 16 },
+    labelGap: 8,          // distanza delle etichette dal bordo dell'anello
+    // "Niemen / 24 Jun": sopra a destra del segno in cima. dx = distanza dal segno,
+    // baseline = di quanto la riga di base della data sta sopra il bordo esterno dell'anello
+    startLabel: { dx: 8, baseline: 6 },
+    // sosta a Mosca (M3): parentesi fuori dall'anello lungo il tratto della sosta.
+    // gap = distanza dal bordo esterno, tick = trattini alle estremità (verso l'anello),
+    // trunkGap = metà del vuoto dove passa il tronco, labelGap = distanza dell'etichetta
+    moscowBracket: { gap: 5, tick: 4, trunkGap: 5, labelGap: 8, labelAt: 0.75 },
+  },
+
+  // pianta a tre rami (design-spec, "La pianta ha tre rami"): un tronco che si divide
+  // nella guida (centro, gruppo principale) e in due rami laterali sottili.
+  // Coordinate [x, y] relative al centro dell'anello; i rami sono curve di Bézier
+  // quadratiche (inizio = biforcazione, ctrl = punto che dà la curvatura, end = punta).
+  plant: {
+    fork: [0, 92],        // punto in cui il tronco si divide
+    widths: { trunk: 3, guida: 2.25, lateral: 1.4, twig: 1.1 },
+    leafSpread: 40,       // inclinazione delle foglie rispetto al ramo
+    fallWeightX: 0.5,     // su ogni ramo cadono prima le foglie basse ed esterne
+    // guida: foglia in punta + foglie sull'asse (t = posizione lungo la guida, 0–1)
+    // + rametti alterni; "leaves" = foglie del rametto, compresa quella in punta
+    guida: {
+      ctrl: [-8, 0], end: [3, -92],
+      axisLeaves: [{ t: 0.9, side: -1 }],
+      twigs: [
+        { t: 0.84, side: 1,  rise: 52, length: 40, leaves: 4 },
+        { t: 0.72, side: -1, rise: 46, length: 54, leaves: 5 },
+        { t: 0.6,  side: 1,  rise: 42, length: 62, leaves: 6 },
+        { t: 0.48, side: -1, rise: 35, length: 72, leaves: 6 },
+        { t: 0.36, side: 1,  rise: 36, length: 60, leaves: 6 },
+        { t: 0.3,  side: -1, rise: 32, length: 56, leaves: 5 },
+      ],
+      twigFirstStop: 0.3, // prima foglia del rametto (frazione della lunghezza)
+    },
+    // rami laterali: "stops" = posizione delle foglie lungo il ramo; l'ultima (1) è la punta
+    destra:   { ctrl: [70, 85],  end: [98, -5], stops: [0.4, 0.53, 0.66, 0.79, 0.9, 1] },
+    sinistra: { ctrl: [-78, 94], end: [-100, -14], stops: [0.84, 1] },
+  },
+  // colonne dei dati per ramo; un ramo laterale diventa traccia dal giorno in cui
+  // migrazione_oggi vale questo valore (le sue foglie sono passate sulla guida)
+  branchData: {
+    guida:    { column: "foglie_guida" },
+    destra:   { column: "foglie_destra",   traceFrom: "destra_su_guida" },
+    sinistra: { column: "foglie_sinistra", traceFrom: "sinistra_su_guida" },
+  },
+
+  ground: {
+    y: 610,               // linea del terreno: tronco il più lungo possibile in 560 × 700 (V9)
+    left: 16, right: 544, // larghezza utile (linea del terreno e tappeto)
+  },
+
+  // tappeto di foglie cadute (design-spec, "Foglie cadute"): si riempie da sinistra
+  // nell'ordine di petali_caduti.csv, a colonne corte di "layers" foglie. Con tutte le
+  // foglie cadute copre la larghezza utile. Rotazioni e spostamenti sono "casuali" ma
+  // fissi (dipendono solo dal numero della foglia): stesso giorno = stessa immagine.
+  carpet: {
+    layers: 2,            // strati (foglie per colonna)
+    layerHeight: 9,       // dislivello tra uno strato e quello sopra
+    maxRotation: 14,      // rotazione massima delle foglie (gradi, ±)
+    jitterX: 0.2,         // spostamento orizzontale massimo (frazione del passo tra colonne)
+    jitterY: 2,           // sollevamento massimo dal suolo
+    bracketGap: 6,        // distanza tra terreno e linea a parentesi sotto ogni tratto
+    bracketTick: 3,       // altezza delle stanghette alle estremità della parentesi
+    // legenda sotto il tappeto, sempre (design-spec, aggiornamento dopo la V6): una riga per
+    // stagione con almeno una foglia, allineata a sinistra; spazio riservato per tre righe.
+    // rowStep: distanza tra le righe (in em del testo); leafScale: dimensione della foglia
+    // a inizio riga rispetto a quelle del tappeto; leafGap: spazio tra foglia e testo.
+    legend: { rowStep: 1.3, leafScale: 0.55, leafGap: 6 },
+    // riga piccola della legenda (design-spec §3, "Riga sull'arrotondamento", 27 ottobre): compare
+    // con la prima riga della legenda. Peso 300, muted, stessa dimensione della nota in fondo
+    // (letta dalla pagina), mai sotto minTextPx. Dove c'è spazio (desktop) sta ACCANTO alla
+    // legenda: allineata a destra al bordo del tappeto, sulla linea di base della prima riga.
+    // C'è spazio se la legenda più lunga (tre righe, numeri del 14 dicembre) + besideGap + la
+    // riga stanno nella larghezza del tappeto: misurato dalla pagina, una sola posizione per
+    // larghezza in tutti i giorni. Altrimenti (telefoni) sta SOTTO l'ultima riga visibile, a
+    // gapEm (in em della riga), e lo spazio è riservato sotto la terza riga della legenda.
+    roundingNote: { text: "Leaves are rounded: men lost are exact.", gapEm: 1.4, besideGap: 16 },
+  },
+
+  // etichette dell'anello con tacca (design-spec §4, E2, E3, E5, E6): nome sopra, data sotto.
+  // Compaiono il giorno "date", restano muted fino a "until" compreso (se manca: solo quel
+  // giorno), poi diventano traccia. Niemen (E1) e Moscow (E4) sono disegnate a parte.
+  ringMarks: [
+    { key: "smolensk", date: "1812-08-17", lines: ["Smolensk", "17 Aug"] },
+    { key: "borodino", date: "1812-09-07", lines: ["Borodino", "7 Sep"] },
+    { key: "frost", date: "1812-11-09", lines: ["First frost", "9 Nov"] },
+    { key: "berezina", date: "1812-11-26", until: "1812-11-29", lines: ["Berezina", "26–29 Nov"] },
+  ],
+
+  // valori attesi per la validazione (CLAUDE.md + design-spec.md)
+  expected: {
+    troopRows: 51,
+    startMen: 422000,
+    moscowMen: 139000,     // totale di tutti i gruppi il 14 settembre
+    endMen: 10000,
+    startLeaves: 42,
+    fallenByColor: { verde: 28, marrone: 6, gelo: 7 },
+  },
+};
+
+// =====================================================================
+// Funzioni di aiuto
+// =====================================================================
+const parseDate = d3.timeParse("%Y-%m-%d");
+const fmtDate = d3.timeFormat("%-d %B %Y");
+const fmtShort = d3.timeFormat("%-d %b %Y");
+const fmtDay = d3.timeFormat("%-d %b");
+const fmtNum = d3.format(",");
+const rad = deg => deg * Math.PI / 180;
+
+// angolo del calendario (0° in alto, senso orario) → coordinate
+function polar(angleDeg, r) {
+  return [SETTINGS.ring.cx + r * Math.sin(rad(angleDeg)),
+          SETTINGS.ring.cy - r * Math.cos(rad(angleDeg))];
+}
+
+// arco come linea (si disegna con stroke, così si può tratteggiare)
+function arcPath(a0, a1, r) {
+  const [x0, y0] = polar(a0, r);
+  const [x1, y1] = polar(a1, r);
+  const large = (a1 - a0) > 180 ? 1 : 0;
+  return `M${x0},${y0} A${r},${r} 0 ${large} 1 ${x1},${y1}`;
+}
+
+// forma della foglia: base in (0,0), punta in (L,0); larghezza massima circa 1,5 × W
+function leafPath(L, W) {
+  return `M0,0 C${L * 0.3},${-W} ${L * 0.7},${-W * 0.9} ${L},0 ` +
+         `C${L * 0.7},${W * 0.9} ${L * 0.3},${W} 0,0 Z`;
+}
+
+// mezza foglia: la stessa foglia spezzata per il lungo, lungo la nervatura centrale.
+// Resta il lato superiore, chiuso da un bordo spezzato (piccolo zig-zag sulla nervatura).
+// Il 14 dicembre, nello stesso posto, torna la foglia intera.
+function halfLeafPath(L, W) {
+  const a = SETTINGS.leaf.breakDepth;   // profondità del bordo spezzato
+  const zig = [0.84, 0.67, 0.5, 0.33, 0.16].map((f, i) => `L${(L * f).toFixed(2)},${i % 2 ? -a : a}`);
+  return `M0,0 C${L * 0.3},${-W} ${L * 0.7},${-W * 0.9} ${L},0 ${zig.join(" ")} Z`;
+}
+
+// sagome usate per ritagliare il bordo interno della brina (una volta sola, in <defs>):
+// il ritaglio usa le coordinate della foglia, quindi vale per tutte, comunque ruotate
+function addLeafClips(svg) {
+  const L = SETTINGS.leaf.length, W = SETTINGS.leaf.width;
+  const defs = svg.append("defs");
+  defs.append("clipPath").attr("id", "leaf-clip-full").append("path").attr("d", leafPath(L, W));
+  defs.append("clipPath").attr("id", "leaf-clip-half").append("path").attr("d", halfLeafPath(L, W));
+}
+
+// disegna una foglia (intera o mezza) dentro un gruppo <g> già posizionato.
+// Il primo <path> (classe "shape") è la sagoma della foglia: il test conta quelli.
+function drawLeaf(g, colorKey, half = false) {
+  const C = SETTINGS.colors, L = SETTINGS.leaf.length, W = SETTINGS.leaf.width;
+  const d = half ? halfLeafPath(L, W) : leafPath(L, W);
+  const frozen = colorKey === "gelo";
+  g.append("path")
+    .attr("class", "shape")
+    .attr("d", d)
+    .attr("fill", C[colorKey])
+    .attr("stroke", frozen ? "none" : C.paper)   // la foglia gelata ha il suo contorno, sotto
+    .attr("stroke-width", 1);
+  if (!half) {
+    g.append("line")           // nervatura centrale (nella mezza foglia è il bordo spezzato)
+      .attr("x1", 2).attr("y1", 0)
+      .attr("x2", L * 0.85).attr("y2", 0)
+      .attr("stroke", "rgba(255,255,255,0.35)")
+      .attr("stroke-width", 1);
+  }
+  if (frozen) {
+    // brina: bordo bianco interno (tratto largo ritagliato dentro la sagoma) e puntini
+    g.append("path")
+      .attr("d", d)
+      .attr("fill", "none")
+      .attr("stroke", C.frost)
+      .attr("stroke-width", 2.6)
+      .attr("clip-path", `url(#leaf-clip-${half ? "half" : "full"})`);
+    [[0.28, -0.32], [0.5, 0.3], [0.68, -0.22], [0.82, 0.12]]
+      .filter(([, fy]) => !half || fy < 0).forEach(([fx, fy]) => {   // mezza foglia: solo il lato rimasto
+      g.append("circle")
+        .attr("cx", L * fx).attr("cy", W * fy)
+        .attr("r", 1.3)
+        .attr("fill", C.frost);
+    });
+    // contorno sottile più scuro, sopra la brina: sul bianco dello sfondo la brina da sola non si vede
+    g.append("path")
+      .attr("d", d)
+      .attr("fill", "none")
+      .attr("stroke", C.frostOutline)
+      .attr("stroke-width", 0.9);
+  }
+}
+
+// numero "casuale" ma fisso tra 0 e 1, dato un seme (il numero della foglia) e un indice
+function seeded(seed, k) {
+  const x = Math.sin(seed * 12.9898 + k * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+// testo su più righe: ogni riga è un <tspan>; "align" = top | bottom;
+// "size" = una dimensione per tutte le righe, "sizes" = una per riga
+function multiline(parent, x, y, lines, opts = {}) {
+  const t = parent.append("text")
+    .attr("x", x).attr("y", y)
+    .attr("text-anchor", opts.anchor ?? "middle")
+    .attr("class", opts.cls ?? null);
+  lines.forEach((line, i) => {
+    const first = i === 0;
+    const dy = first
+      ? (opts.align === "bottom" ? `${-(lines.length - 1) * 1.2}em` : (opts.firstDy ?? "0.8em"))
+      : "1.2em";
+    t.append("tspan")
+      .attr("x", x).attr("dy", dy)
+      .attr("data-size", opts.sizes ? opts.sizes[i] : opts.size)
+      .text(line);
+  });
+  return t;
+}
+
+// =====================================================================
+// Caricamento e validazione dei dati
+// =====================================================================
+Promise.all([
+  d3.csv(SETTINGS.files.fiore, d3.autoType),
+  d3.csv(SETTINGS.files.caduti, d3.autoType),
+  d3.csv(SETTINGS.files.tappe, d3.autoType),
+]).then(([fiore, caduti, tappe]) => {
+  // d3.autoType trasforma le date in oggetti Date (UTC): le riporto a stringa
+  const iso = d => (d instanceof Date ? d.toISOString().slice(0, 10) : d);
+  // pandas scrive True/False, che d3.autoType lascia come testo
+  fiore.forEach(d => {
+    d.data = iso(d.data);
+    d.mezza_foglia_guida = String(d.mezza_foglia_guida).toLowerCase() === "true";
+  });
+  caduti.forEach(d => { d.data = iso(d.data); });
+  tappe.forEach(d => { d.data = iso(d.data); });
+
+  validate(fiore, caduti, tappe);
+  build(fiore, caduti, tappe);
+}).catch(err => {
+  showError("Could not load the CSV files. Open this page with Live Server " +
+            "from the project folder (minard-1812). Details: " + err.message);
+  console.error(err);
+});
+
+function showError(msg) {
+  const el = document.getElementById("error");
+  el.hidden = false;
+  el.textContent = msg;
+}
+
+function validate(fiore, caduti, tappe) {
+  const E = SETTINGS.expected;
+  const day = date => fiore.find(d => d.data === date);
+  const counts = d3.rollup(caduti, v => v.length, d => d.colore_foglia);
+  const checks = [
+    ["righe di truppe (minard_tappe)", tappe.length, E.troopRows],
+    ["uomini il 24 giugno", fiore[0].totale, E.startMen],
+    ["uomini a Mosca (14 set, tutti i gruppi)", day("1812-09-14")?.totale, E.moscowMen],
+    ["uomini a Kowno (14 dic)", fiore[fiore.length - 1].totale, E.endMen],
+    ["foglie all'inizio", fiore[0].petali, E.startLeaves],
+    ["foglie cadute totali", caduti.length,
+      d3.sum(Object.values(E.fallenByColor))],
+    ...Object.entries(E.fallenByColor).map(([k, v]) =>
+      [`foglie cadute ${k}`, counts.get(k) ?? 0, v]),
+    ["foglie rimaste + cadute", fiore[fiore.length - 1].petali + caduti.length, E.startLeaves],
+    ["giorni con guida + destra + sinistra ≠ petali", fiore.filter(d =>
+      d3.sum(Object.values(SETTINGS.branchData), b => d[b.column]) !== d.petali).length, 0],
+    ["giorni non consecutivi (giorno ≠ riga)", fiore.filter((d, i) => d.giorno !== i).length, 0],
+    ["km: nessun valore vuoto", fiore.filter(d => !Number.isFinite(d.km_percorsi)).length, 0],
+    ["km: giorni in cui diminuiscono", fiore.filter((d, i) => i && d.km_percorsi < fiore[i - 1].km_percorsi).length, 0],
+  ];
+  const table = checks.map(([name, got, want]) => ({ controllo: name, atteso: want, trovato: got, ok: got === want }));
+  console.table(table);
+  const bad = table.filter(r => !r.ok);
+  if (bad.length) {
+    showError("Data check failed: " +
+      bad.map(r => `${r.controllo} (expected ${r.atteso}, found ${r.trovato})`).join("; "));
+  }
+}
+
+// =====================================================================
+// Pianta a tre rami: forma dei rami e posti fissi delle foglie su ciascun ramo
+// =====================================================================
+// punto e direzione (gradi SVG) di una Bézier quadratica al parametro t
+function bezier(p0, p1, p2, t) {
+  const u = 1 - t;
+  const x = u * u * p0[0] + 2 * u * t * p1[0] + t * t * p2[0];
+  const y = u * u * p0[1] + 2 * u * t * p1[1] + t * t * p2[1];
+  const dx = 2 * u * (p1[0] - p0[0]) + 2 * t * (p2[0] - p1[0]);
+  const dy = 2 * u * (p1[1] - p0[1]) + 2 * t * (p2[1] - p1[1]);
+  return { x, y, angle: Math.atan2(dy, dx) * 180 / Math.PI };
+}
+
+function plantLayout(fiore) {
+  const S = SETTINGS, P = S.plant, R = S.ring;
+  const cx = R.cx, cy = R.cy;
+  const abs = ([x, y]) => [cx + x, cy + y];   // da relativo al centro a coordinate della scena
+  const fork = abs(P.fork);
+  const slots = { guida: [], destra: [], sinistra: [] };
+  const branches = [];   // linee da disegnare: { ramo, kind, d }
+  const add = (ramo, x, y, angle) => slots[ramo].push({ ramo, x, y, angle });
+  const curve = (p0, p1, p2) => `M${p0[0]},${p0[1]} Q${p1[0]},${p1[1]} ${p2[0]},${p2[1]}`;
+
+  // guida: punta, foglie sull'asse, rametti alterni (ognuno con foglie alternate + punta)
+  const G = P.guida, gCtrl = abs(G.ctrl), gEnd = abs(G.end);
+  branches.push({ ramo: "guida", kind: "guida", d: curve(fork, gCtrl, gEnd) });
+  const onGuide = t => bezier(fork, gCtrl, gEnd, t);
+  add("guida", gEnd[0], gEnd[1], onGuide(1).angle);
+  G.axisLeaves.forEach(a => {
+    const p = onGuide(a.t);
+    add("guida", p.x, p.y, p.angle + a.side * P.leafSpread);
+  });
+  G.twigs.forEach(tw => {
+    const p = onGuide(tw.t);
+    const angle = tw.side > 0 ? -tw.rise : -180 + tw.rise;   // gradi SVG
+    const x1 = p.x + tw.length * Math.cos(rad(angle));
+    const y1 = p.y + tw.length * Math.sin(rad(angle));
+    branches.push({ ramo: "guida", kind: "twig", d: `M${p.x},${p.y} L${x1},${y1}` });
+    for (let i = 0; i < tw.leaves - 1; i++) {
+      const f = G.twigFirstStop + (1 - G.twigFirstStop) * i / (tw.leaves - 1);
+      add("guida", p.x + (x1 - p.x) * f, p.y + (y1 - p.y) * f,
+          angle + (i % 2 ? -1 : 1) * P.leafSpread);
+    }
+    add("guida", x1, y1, angle);
+  });
+
+  // rami laterali: foglie alternate lungo la curva, l'ultima in punta
+  ["destra", "sinistra"].forEach(ramo => {
+    const b = P[ramo], ctrl = abs(b.ctrl), end = abs(b.end);
+    branches.push({ ramo, kind: "lateral", d: curve(fork, ctrl, end) });
+    b.stops.forEach((t, i) => {
+      const p = bezier(fork, ctrl, end, t);
+      add(ramo, p.x, p.y, t === 1 ? p.angle : p.angle + (i % 2 ? -1 : 1) * P.leafSpread);
+    });
+  });
+
+  // su ogni ramo: restano più a lungo le foglie alte e interne
+  Object.values(slots).forEach(list => {
+    list.forEach(s => { s.keep = s.y + P.fallWeightX * Math.abs(s.x - cx); });
+    list.sort((a, b) => a.keep - b.keep);
+  });
+
+  // controllo: posti per ramo sufficienti per i dati, 42 posti in tutto
+  const allSlots = Object.values(slots).flat();
+  const capacity = Object.entries(S.branchData).map(([ramo, b]) => ({
+    ramo, posti: slots[ramo].length, "massimo nei dati": d3.max(fiore, d => d[b.column]),
+  }));
+  console.table(capacity);
+  capacity.filter(c => c["massimo nei dati"] > c.posti).forEach(c =>
+    showError(`Plant layout check failed: branch ${c.ramo} has ${c.posti} places, ` +
+              `the data need ${c["massimo nei dati"]}.`));
+
+  // controllo: la chioma completa (più la mezza foglia) deve stare dentro l'anello
+  const L = S.leaf.length, halfW = S.leaf.width * 0.75;
+  let maxDist = 0;
+  allSlots.forEach(s => {
+    const a = rad(s.angle);
+    const ux = Math.cos(a), uy = Math.sin(a);       // lungo la foglia
+    const nx = -uy, ny = ux;                         // di traverso
+    [[0, 0], [L, 0], [L / 2, halfW], [L / 2, -halfW]].forEach(([u, n]) => {
+      const px = s.x + ux * u + nx * n, py = s.y + uy * u + ny * n;
+      maxDist = Math.max(maxDist, Math.hypot(px - cx, py - cy));
+    });
+  });
+  const inner = R.radius - R.thickness / 2;
+  // (la mezza foglia occupa un posto della guida ed è più corta: se ci sta la foglia intera, ci sta anche lei)
+  console.table([{ controllo: "chioma completa dentro l'anello",
+    "distanza max": Math.round(maxDist), "bordo interno": inner, ok: maxDist < inner,
+    foglie: allSlots.length }]);
+  if (allSlots.length !== S.expected.startLeaves || maxDist >= inner) {
+    showError(`Plant layout check failed: ${allSlots.length} leaves, ` +
+              `max distance ${Math.round(maxDist)} vs ring ${inner}.`);
+  }
+  return { slots, branches, fork };
+}
+
+// =====================================================================
+// Costruzione della scena
+// =====================================================================
+function build(fiore, caduti, tappe) {
+  const S = SETTINGS, C = S.colors, R = S.ring, G = S.ground;
+  const svg = d3.select("#chart").attr("viewBox", `0 0 ${S.width} ${S.height}`);
+  addLeafClips(svg);
+  const byDate = new Map(fiore.map(d => [d.data, d]));
+
+  // date con stima: un giorno è "stimato" se nessuna tappa di quel giorno è un'ancora storica
+  const tappeByDate = d3.group(tappe, d => d.data);
+  const isEstimated = date => {
+    const rows = tappeByDate.get(date);
+    return !rows || !rows.some(r => r.tipo_data === "ancora_storica");
+  };
+
+  // --- livelli (dal fondo verso l'alto) ---
+  const gHeader = svg.append("g");
+  const gScene = svg.append("g");        // tutto ciò che sta sotto l'intestazione
+  // anello, segni e pianta si spostano insieme di scene.shiftX quando c'è la colonna delle note;
+  // terreno, tappeto e legenda no
+  const gShiftBack = gScene.append("g");
+  const gRing = gShiftBack.append("g");
+  const gMarks = gShiftBack.append("g");
+  const gGround = gScene.append("g");
+  const gShiftFront = gScene.append("g");
+  const gPlant = gShiftFront.append("g");
+  // foglie in volo durante l'animazione (copie temporanee): sopra pianta e tappeto, mai
+  // toccato da render(). Le coordinate della chioma qui vanno spostate di currentShiftX.
+  const gAnim = gScene.append("g").attr("class", "anim-layer");
+  const gNote = svg.append("g").attr("class", "note");   // nota del momento (colonna o tutta larghezza)
+
+  // stato condiviso tra render() e l'animazione. Nella versione statica è tutto vuoto,
+  // quindi render() disegna esattamente come la V10.
+  const hiddenPetals = new Set();   // foglie del tappeto che aspettano la loro foglia in volo
+  const hiddenSlots = new Set();    // posti della chioma ("guida:3") che aspettano una migrazione
+  const branchHold = new Set();     // rami laterali che non sono ancora traccia (foglie in volo)
+  const crownNodes = new Map();     // posto della chioma → <g> disegnato dall'ultimo render()
+  const fallenNodes = new Map();    // numero della foglia caduta → <g> sul tappeto
+  const noteFade = { all: 1, tail: 1 };   // opacità della nota e dei paragrafi dopo il primo
+  let noteLines = [];               // righe della nota mostrata: { para, node }
+  let currentShiftX = 0;            // spostamento orizzontale della scena (colonna delle note)
+  let currentGiorno = 0, currentDate = null;
+
+  // --- intestazione dentro la scena (serve anche per il video) ---
+  // la posizione verticale di ogni riga è calcolata in layoutHeader()
+  const H = S.header;
+  const headerText = (size, weight, cls) => gHeader.append("text")
+    .attr("x", H.x).attr("text-anchor", "middle")
+    .attr("font-weight", weight).attr("class", cls ?? null).attr("data-size", size);
+  const titleText = headerText(S.text.title, 800).text(S.title);       // fisso
+  const subtitleText = headerText(S.text.subtitle, 400);                // fisso
+  const headerRule = gHeader.append("line")
+    .attr("x1", H.x - H.ruleWidth / 2).attr("x2", H.x + H.ruleWidth / 2)
+    .attr("stroke", C.rule).attr("stroke-width", 1);
+  const dateText = headerText(S.text.date, 600);
+
+  // contatori separati sulla stessa riga sotto la data: uomini a sinistra, km a destra
+  const counterText = (x, anchor, size, weight, cls) => gHeader.append("text")
+    .attr("x", x).attr("text-anchor", anchor)
+    .attr("font-weight", weight).attr("class", cls).attr("data-size", size);
+  const L = S.counterLabels;
+  const menNum = counterText(H.left, "start", S.text.counter, 800, "num counter men");
+  const menLabel = counterText(H.left, "start", S.text.counterLabel, 400, "muted counter men").text(L.men);
+  const kmNum = counterText(H.right, "end", S.text.counterSmall, 800, "km-num counter km");
+  const kmLabel = counterText(H.right, "end", S.text.counterLabel, 400, "muted counter km").text(L.km);
+  const kmSub = counterText(H.right, "end", S.text.counterLabel, 300, "muted counter km");
+
+  // --- nota del momento in corso (SETTINGS.notes) ---
+  // Con la colonna: a destra dell'albero, con una linea verticale sottile a sinistra.
+  // Telefoni (colonna troppo stretta sullo schermo): a tutta larghezza sotto i contatori.
+  const NC = S.noteColumn;
+  // dimensione del testo delle note: più grande solo nel video (?video=1)
+  const noteSize = new URLSearchParams(location.search).get("video") === "1" ? S.video.note : S.text.note;
+  const noteRule = gNote.append("line").attr("class", "note-rule")
+    .attr("stroke", C.rule).attr("stroke-width", NC.ruleWidth);
+  const noteColumnRect = gNote.append("rect").attr("class", "note-column")   // invisibile, misurato
+    .attr("fill", "none").attr("stroke", "none");
+  const noteText = gNote.append("text").attr("class", "note-text")
+    .attr("text-anchor", "start").attr("font-weight", 400).attr("data-size", noteSize);
+  let currentNote = null;
+  let columnMode = true;
+
+  // --- anello: binario grigio completo ---
+  gRing.append("circle")
+    .attr("class", "ring-track")
+    .attr("cx", R.cx).attr("cy", R.cy).attr("r", R.radius)
+    .attr("fill", "none")
+    .attr("stroke", C.track)
+    .attr("stroke-width", R.thickness);
+  const gRingDone = gRing.append("g");
+  // cursore della data (C3): punta di freccia, disegnata in render()
+  const cursor = gRing.append("path").attr("class", "ring-cursor").attr("fill", C.ink);
+
+  // --- segni sull'anello ---
+  // Ogni segno (etichetta ed eventuale tacca) compare il suo giorno ("from"), resta nello
+  // stile muted fino a "until" compreso, poi diventa traccia tenue (colors.markTrace).
+  // Prima di "from" è nascosto (design-spec, decisioni del 22 ottobre).
+  // Etichette su due righe: nome (text.ring) e data (text.ringDate, circa 15% più piccola).
+  const outer = R.radius + R.thickness / 2;
+  const labelR = outer + R.labelGap;
+  const ringMarks = [];   // { key, from, until, text, tick }
+  const labelSizes = [S.text.ring, S.text.ringDate];
+
+  function ringTick(angle) {
+    const [x0, y0] = polar(angle, R.radius - R.thickness / 2 - 4);
+    const [x1, y1] = polar(angle, outer + 4);
+    return gMarks.append("line")
+      .attr("class", "ring-tick")
+      .attr("x1", x0).attr("y1", y0).attr("x2", x1).attr("y2", y1)
+      .attr("stroke", C.ink).attr("stroke-width", 1.25);
+  }
+
+  // Niemen (E1): dal giorno 0, muted solo quel giorno; sopra a destra del segno in cima.
+  // Serve anche a impaginare la scena (fitScene), quindi resta sempre nel documento.
+  const startTick = ringTick(0);
+  const startLabel = multiline(gMarks, R.cx + R.startLabel.dx, R.cy - outer - R.startLabel.baseline,
+    ["Niemen", fmtDay(parseDate(fiore[0].data))],
+    { cls: "muted", sizes: labelSizes, anchor: "start", align: "bottom" });
+  ringMarks.push({ key: "start", from: fiore[0].giorno, until: fiore[0].giorno, text: startLabel, tick: startTick });
+
+  // etichette con tacca (Smolensk, Borodino, primo gelo, Berezina): a destra dell'anello
+  // allineate a sinistra, a sinistra allineate a destra; nella metà alta il testo sta sopra
+  // il punto, nella metà bassa sotto
+  S.ringMarks.forEach(m => {
+    const d = byDate.get(m.date);
+    if (!d) return;
+    const until = m.until ? byDate.get(m.until) : d;
+    const a = d.angolo_gradi;
+    const tick = ringTick(a);
+    const right = a < 180, top = a < 90 || a > 270;
+    const text = multiline(gMarks, ...polar(a, labelR), m.lines,
+      { cls: "muted", sizes: labelSizes, anchor: right ? "start" : "end",
+        align: top ? "bottom" : "top", firstDy: "0.7em" });
+    ringMarks.push({ key: m.key, from: d.giorno, until: until.giorno, text, tick });
+  });
+
+  // Moscow (E4, M3): parentesi fuori dall'anello lungo il tratto della sosta, che cresce con
+  // il cursore e si chiude il giorno della partenza; etichetta accanto, fuori dalla parentesi.
+  // Muted per tutta la sosta fino alla partenza compresa (la data di fine dell'etichetta).
+  const MB = R.moscowBracket;
+  const bracketR = outer + MB.gap;
+  const sosta = fiore.filter(d => d.fase === "sosta_mosca");
+  const gMoscow = gMarks.append("g").attr("class", "moscow-bracket").attr("data-mark", "moscow");
+  let moscow = null;
+  if (sosta.length) {
+    const first = sosta[0], last = sosta[sosta.length - 1];
+    const next = fiore[fiore.indexOf(last) + 1] ?? last;
+    const at = first.angolo_gradi + MB.labelAt * (next.angolo_gradi - first.angolo_gradi);
+    const text = multiline(gMarks, ...polar(at, bracketR + MB.labelGap),
+      ["Moscow", `${fmtDay(parseDate(first.data))}–${fmtDay(parseDate(next.data))}`],
+      { cls: "muted", sizes: labelSizes, anchor: "end", align: "top", firstDy: "0.7em" });
+    moscow = { from: first, to: next };
+    ringMarks.push({ key: "moscow", from: first.giorno, until: next.giorno, text, tick: null });
+  }
+
+  // parentesi di Mosca al giorno scelto: arco dall'inizio della sosta fino al cursore,
+  // con il vuoto dove passa il tronco (180°), trattino iniziale e, dalla partenza, finale
+  function drawMoscowBracket(day) {
+    gMoscow.selectAll("*").remove();
+    if (!moscow || day.giorno < moscow.from.giorno) { gMoscow.attr("display", "none"); return; }
+    gMoscow.attr("display", null);
+    const trace = day.giorno > moscow.to.giorno;
+    const color = trace ? C.markTrace : C.inkMuted;
+    const a0 = moscow.from.angolo_gradi;
+    const a1 = Math.min(day.angolo_gradi, moscow.to.angolo_gradi);
+    const gapDeg = MB.trunkGap / bracketR * 180 / Math.PI;
+    // l'arco si ferma prima del vuoto del tronco e riprende dopo (anche quando il cursore
+    // è proprio a 180°)
+    const pieces = [[a0, Math.min(a1, 180 - gapDeg)], [Math.max(a0, 180 + gapDeg), a1]];
+    const tick = a => {
+      const [x0, y0] = polar(a, bracketR - MB.tick), [x1, y1] = polar(a, bracketR);
+      return `M${x0},${y0} L${x1},${y1}`;
+    };
+    let d = tick(a0);
+    pieces.filter(([p0, p1]) => p1 > p0).forEach(([p0, p1]) => { d += " " + arcPath(p0, p1, bracketR); });
+    if (day.giorno >= moscow.to.giorno) d += " " + tick(moscow.to.angolo_gradi);
+    gMoscow.append("path").attr("d", d).attr("fill", "none")
+      .attr("stroke", color).attr("stroke-width", 1);
+  }
+
+  ringMarks.forEach(m => {
+    m.text.attr("class", "muted ring-label").attr("data-mark", m.key);
+    if (m.tick) m.tick.attr("data-mark", m.key);
+  });
+
+  // --- pianta: tronco dal terreno fino alla biforcazione, poi i tre rami ---
+  const { slots, branches, fork } = plantLayout(fiore);
+  const PW = S.plant.widths;
+  gPlant.append("path")
+    .attr("class", "trunk")
+    .attr("d", `M${R.cx},${G.y} C${R.cx - 5},${(G.y + fork[1]) / 2 + 30} ` +
+               `${R.cx + 4},${fork[1] + 30} ${fork[0]},${fork[1]}`)
+    .attr("fill", "none")
+    .attr("stroke", C.ink)
+    .attr("stroke-width", PW.trunk)
+    .attr("stroke-linecap", "round");
+  // i rami restano sempre visibili; quelli laterali cambiano colore quando diventano traccia
+  const branchLines = gPlant.append("g").selectAll("path").data(branches).join("path")
+    .attr("class", "branch")
+    .attr("data-ramo", b => b.ramo)
+    .attr("d", b => b.d)
+    .attr("fill", "none")
+    .attr("stroke-width", b => PW[b.kind] ?? PW.lateral)
+    .attr("stroke-linecap", "round");
+
+  // primo giorno in cui ogni ramo laterale è traccia (letto da migrazione_oggi)
+  const traceFrom = {};
+  Object.entries(S.branchData).forEach(([ramo, b]) => {
+    const d = b.traceFrom && fiore.find(r => r.migrazione_oggi === b.traceFrom);
+    traceFrom[ramo] = d ? d.giorno : Infinity;   // la guida non è mai traccia
+  });
+  const gCrown = gPlant.append("g").attr("class", "crown");
+
+  // --- terreno e tappeto di foglie cadute ---
+  gGround.append("line")
+    .attr("class", "ground-line")
+    .attr("x1", G.left).attr("x2", G.right)
+    .attr("y1", G.y).attr("y2", G.y)
+    .attr("stroke", C.ink).attr("stroke-width", 1.5);
+
+  // posto fisso di ogni foglia caduta, nell'ordine di caduta (petali_caduti.csv):
+  // colonna = i / strati, strato = resto; ogni strato è sfalsato di una frazione di passo.
+  // Le posizioni sono poi scalate perché il tappeto completo copra la larghezza utile.
+  const CP = S.carpet, LL = S.leaf.length, halfT = S.leaf.width * 0.75;
+  const order = [...caduti].sort((a, b) => a.petalo - b.petalo);
+  const units = order.map((c, i) => Math.floor(i / CP.layers) + (i % CP.layers) / CP.layers +
+    (seeded(c.petalo, 0) * 2 - 1) * CP.jitterX);
+  const uMin = d3.min(units), uMax = d3.max(units);
+  const carpetX = d3.scaleLinear().domain([uMin, uMax]).range([G.left + LL / 2, G.right - LL / 2]);
+  const carpetPos = new Map(order.map((c, i) => {
+    const rot = (seeded(c.petalo, 1) * 2 - 1) * CP.maxRotation;
+    const flip = seeded(c.petalo, 2) < 0.5 ? 180 : 0;          // punta a destra o a sinistra
+    const below = Math.abs(Math.sin(rad(rot))) * LL / 2 + halfT;   // quanto scende sotto il centro
+    const y = G.y - 1 - below - (i % CP.layers) * CP.layerHeight - seeded(c.petalo, 3) * CP.jitterY;
+    return [c.petalo, { i, x: carpetX(units[i]), y, rot: rot + flip }];
+  }));
+
+  const gFallen = gGround.append("g").attr("class", "fallen");
+  const gBrackets = gGround.append("g");
+  const seasons = Object.keys(S.seasonNames);   // verde, marrone, gelo: l'ordine del tappeto
+
+  // legenda sotto il tappeto, sempre (design-spec, aggiornamento dopo la V6): una riga per
+  // stagione con almeno una foglia = piccola foglia (come quelle del tappeto) + testo su una riga
+  const LG = CP.legend;
+  const gLegend = gGround.append("g").attr("class", "carpet-legend");
+  const legendRows = {};
+  seasons.forEach(k => {
+    const row = gLegend.append("g").attr("class", "legend-row").attr("data-season", k);
+    const leafG = row.append("g").attr("class", "legend-leaf");
+    drawLeaf(leafG, k);
+    const t = row.append("text").attr("x", G.left + LL * LG.leafScale + LG.leafGap)
+      .attr("data-size", S.text.carpetSub);
+    const name = t.append("tspan").attr("font-weight", 600);
+    const rest = t.append("tspan").attr("class", "muted");
+    legendRows[k] = { row, leafG, t, name, rest, visible: false };
+  });
+  // riga sull'arrotondamento, sotto la legenda (CP.roundingNote)
+  const roundingNote = gLegend.append("text").attr("class", "muted carpet-note")
+    .attr("x", G.left).attr("font-weight", 300).text(CP.roundingNote.text);
+
+  // dimensione della riga sull'arrotondamento in unità del viewBox: quella della nota in fondo
+  // alla pagina (in pixel dello schermo), mai sotto minTextPx
+  function roundingNoteSize(scale) {
+    const footer = document.querySelector("footer");
+    const footerPx = footer ? parseFloat(getComputedStyle(footer).fontSize) : S.minTextPx;
+    return Math.max(footerPx, S.minTextPx) / scale;
+  }
+
+  // larghezza di un testo (unità del viewBox) misurata con un <text> temporaneo, poi tolto.
+  // parts = [[testo, peso], ...]
+  function measureText(parts, size) {
+    const probe = gLegend.append("text").attr("font-size", size).attr("visibility", "hidden");
+    parts.forEach(([txt, weight]) => probe.append("tspan").attr("font-weight", weight).text(txt));
+    const w = probe.node().getComputedTextLength();
+    probe.remove();
+    return w;
+  }
+  // riga più larga della legenda più lunga: tutte le foglie cadute, uomini del 14 dicembre
+  function longestLegendRow(fs) {
+    const lost = menLostByColor(fiore.length - 1);
+    const counts = d3.rollup(order, v => v.length, c => c.colore_foglia);
+    return d3.max(seasons.filter(k => counts.get(k)), k => {
+      const n = counts.get(k);
+      return measureText([[S.seasonNames[k], 600],
+        [` · ${n} ${n === 1 ? "leaf" : "leaves"} · ${fmtNum(lost[k])} men`, 400]], fs);
+    }) ?? 0;
+  }
+  let roundingBeside = false;   // riga sull'arrotondamento accanto alla legenda (o sotto)
+
+  // righe della legenda: solo le stagioni con almeno una foglia, una sotto l'altra
+  // (posizioni che dipendono dalla dimensione del testo, quindi ricalcolate con lei).
+  // Poi la riga sull'arrotondamento, accanto o sotto (CP.roundingNote), se c'è almeno una riga.
+  function placeLegend(scale) {
+    const px = units => Math.max(units, S.minTextPx / scale);
+    const fs = px(S.text.carpetSub);
+    const RN = CP.roundingNote, ns = roundingNoteSize(scale);
+    const textX = G.left + LL * LG.leafScale * fs / S.text.carpetSub + LG.leafGap;
+    roundingBeside = textX + longestLegendRow(fs) + RN.besideGap + measureText([[RN.text, 300]], ns) <= G.right;
+    let row = 0, lastBase = null;
+    seasons.forEach(k => {
+      const r = legendRows[k], show = r.visible;
+      r.row.attr("display", show ? null : "none");
+      if (!show) return;
+      const base = G.y + CP.bracketGap + fs * (1.25 + row * LG.rowStep);
+      r.t.attr("y", base);
+      const s = LG.leafScale * fs / S.text.carpetSub;   // la foglia cresce con il testo
+      r.leafG.attr("transform", `translate(${G.left},${base - fs * 0.33}) scale(${s})`);
+      r.t.attr("x", G.left + LL * s + LG.leafGap);
+      lastBase = base;
+      row++;
+    });
+    const firstBase = G.y + CP.bracketGap + fs * 1.25;   // linea di base della prima riga
+    roundingNote.attr("display", lastBase === null ? "none" : null)
+      .attr("font-size", ns.toFixed(1))
+      .attr("data-place", roundingBeside ? "beside" : "below")
+      .attr("text-anchor", roundingBeside ? "end" : "start")
+      .attr("x", roundingBeside ? G.right : G.left)
+      .attr("y", roundingBeside ? firstBase : (lastBase ?? 0) + ns * RN.gapEm);
+  }
+
+  // uomini persi per colore fino alla data scelta: calo netto del totale giornaliero
+  // nei giorni di quel colore (nessun valore inventato, solo differenze dei dati)
+  function menLostByColor(selIndex) {
+    const out = { verde: 0, marrone: 0, gelo: 0 };
+    for (let i = 1; i <= selIndex; i++) {
+      out[fiore[i].colore_foglia] += fiore[i - 1].totale - fiore[i].totale;
+    }
+    return out;
+  }
+
+  // --- dimensione dei testi: mai sotto minTextPx sullo schermo ---
+  function applyTextSizes() {
+    const scale = svg.node().getBoundingClientRect().width / S.width;
+    if (!scale) return;
+    svg.selectAll("[data-size]").each(function () {
+      const size = +this.getAttribute("data-size");
+      this.setAttribute("font-size", Math.max(size, S.minTextPx / scale).toFixed(1));
+    });
+    placeLegend(scale);
+    // colonna delle note o nota a tutta larghezza: misurato sullo schermo, non da una
+    // larghezza fissa. Lo spostamento della scena vale solo con la colonna.
+    columnMode = NC.width * scale >= NC.minPx;
+    const shiftX = columnMode ? S.scene.shiftX : 0;
+    currentShiftX = shiftX;
+    [gShiftBack, gShiftFront].forEach(g => g.attr("transform", shiftX ? `translate(${shiftX},0)` : null));
+    let headBottom = layoutHeader(scale);
+    if (!columnMode) headBottom = layoutFullNote(scale, headBottom);
+    const sceneShift = fitScene(headBottom, scale);
+    if (columnMode) layoutColumnNote(scale, headBottom, sceneShift, shiftX);
+  }
+
+  // impila le righe dell'intestazione; restituisce il fondo dell'intestazione.
+  // La riga di "main army" è sempre riservata (anche il 24 giugno): niente salti tra fotogrammi.
+  function layoutHeader(scale) {
+    const px = units => Math.max(units, S.minTextPx / scale);   // dimensione effettiva
+    const T = S.text;
+    let y = H.titleY;
+    titleText.attr("y", y);
+    const subLines = wrapText(subtitleText, S.subtitle, 1.25);
+    y += px(T.subtitle) * 1.4;
+    subtitleText.attr("y", y);
+    y += (subLines - 1) * px(T.subtitle) * 1.25;
+    // linea sottile tra la parte fissa e quella che cambia, con aria sopra e sotto
+    y += px(T.subtitle) * 0.45 + H.rulePadPx / scale;
+    headerRule.attr("y1", y).attr("y2", y);
+    y += H.rulePadPx / scale + px(T.date) * 0.8;
+    dateText.attr("y", y);
+    // contatori sulla stessa riga sotto la data: numeri sulla stessa riga di base
+    y += px(T.counter) * 1.1;
+    menNum.attr("y", y);
+    kmNum.attr("y", y);
+    y += px(T.counterLabel) * 1.4;   // un po' d'aria sotto il numero grande
+    menLabel.attr("y", y);
+    kmLabel.attr("y", y);
+    y += px(T.counterLabel) * 1.15;
+    kmSub.attr("y", y);
+    return y + px(T.counterLabel) * 0.45;
+  }
+
+  // nelle note le date non si spezzano: tra giorno e mese ("22 December", "7 Sep") uno
+  // spazio non separabile, così "22" e "December" restano sulla stessa riga
+  const keepDates = s => s.replace(
+    /\b(\d{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/g, "$1 $2");
+
+  // testo a capo in più paragrafi dentro maxWidth; restituisce righe e altezza
+  // (dalla prima riga di base all'ultima, in unità del viewBox)
+  function wrapParagraphs(textSel, paras, fs, maxWidth, x) {
+    textSel.selectAll("tspan").remove();
+    let lines = 0, height = 0;
+    noteLines = [];   // l'ultima chiamata è sempre quella della nota mostrata
+    paras.map(keepDates).forEach((para, p) => {
+      let line = [];
+      let tspan = null;
+      const newLine = dy => {
+        tspan = textSel.append("tspan").attr("x", x).attr("dy", lines ? `${dy}em` : 0);
+        noteLines.push({ para: p, node: tspan.node() });
+        if (lines) height += dy * fs;
+        lines++;
+      };
+      newLine(p ? NC.lineHeight + NC.paragraphGap : NC.lineHeight);
+      para.split(" ").forEach(w => {
+        line.push(w);
+        tspan.text(line.join(" "));
+        if (tspan.node().getComputedTextLength() > maxWidth && line.length > 1) {
+          line.pop();
+          tspan.text(line.join(" "));
+          line = [w];
+          newLine(NC.lineHeight);
+          tspan.text(w);
+        }
+      });
+    });
+    return { lines, height };
+  }
+
+  // telefoni: nota a tutta larghezza sotto i contatori. Lo spazio è riservato per la nota
+  // più lunga, così la scena non salta da un giorno all'altro. Restituisce il nuovo fondo.
+  function layoutFullNote(scale, headBottom) {
+    const fs = Math.max(noteSize, S.minTextPx / scale);
+    const width = H.right - H.left;
+    noteRule.attr("display", "none");
+    noteColumnRect.attr("display", "none");
+    let reserved = 0;
+    S.notes.forEach(n => { reserved = Math.max(reserved, wrapParagraphs(noteText, n.text, fs, width, H.left).height); });
+    const top = headBottom + NC.fullGapTop;
+    noteText.attr("y", top + fs * 0.95);
+    wrapParagraphs(noteText, currentNote ? currentNote.text : [], fs, width, H.left);
+    applyNoteVisibility();
+    return top + fs * 0.95 + reserved + fs * 0.45;
+  }
+
+  // opacità della nota durante l'animazione (dissolvenze): "all" per tutta la nota (con la sua
+  // linea), "tail" per i paragrafi dopo il primo (la nota finale del 14 dicembre). A 1 nessun
+  // attributo, come nella V10.
+  function applyNoteVisibility() {
+    gNote.attr("opacity", noteFade.all < 1 ? noteFade.all : null);
+    noteLines.forEach(l => {
+      if (l.para > 0 && noteFade.tail < 1) l.node.setAttribute("fill-opacity", noteFade.tail);
+      else l.node.removeAttribute("fill-opacity");
+    });
+  }
+
+  // desktop: nota nella colonna a destra dell'albero. In alto parte sotto l'intestazione,
+  // in basso si ferma sopra la prima etichetta dell'anello che le sta sotto (misurata,
+  // anche quando l'etichetta è ancora nascosta, così la colonna non cambia da un giorno all'altro)
+  function layoutColumnNote(scale, headBottom, sceneShift, shiftX) {
+    const fs = Math.max(noteSize, S.minTextPx / scale);
+    const x0 = NC.x, x1 = NC.x + NC.width;
+    const top = headBottom + NC.gapTop;
+    let bottom = Infinity;
+    ringMarks.forEach(m => {
+      const shown = m.text.attr("display");
+      m.text.attr("display", null);
+      const b = m.text.node().getBBox();
+      m.text.attr("display", shown);
+      const left = b.x + shiftX, right = left + b.width, y = b.y + sceneShift;
+      if (right > x0 && left < x1 && y > top) bottom = Math.min(bottom, y - NC.gapBottom);
+    });
+    if (!Number.isFinite(bottom)) bottom = top + 200;
+    noteColumnRect.attr("display", null)
+      .attr("x", x0).attr("y", top).attr("width", NC.width).attr("height", bottom - top);
+    const first = top + fs * 0.95;
+    noteText.attr("y", first);
+    const { lines, height } = wrapParagraphs(noteText, currentNote ? currentNote.text : [],
+      fs, NC.width - NC.padLeft, x0 + NC.padLeft);
+    // linea verticale sottile a sinistra, alta quanto il testo
+    noteRule.attr("display", lines ? null : "none")
+      .attr("x1", x0).attr("x2", x0)
+      .attr("y1", top + fs * 0.2).attr("y2", first + height + fs * 0.3);
+    applyNoteVisibility();
+  }
+
+  // spazio sotto l'intestazione: sul desktop la scena resta 560 × 700 (4:5);
+  // sui telefoni stretti anello, pianta e terreno scendono quanto serve.
+  // Restituisce lo spostamento verticale della scena.
+  function fitScene(headBottom, scale) {
+    const px = units => Math.max(units, S.minTextPx / scale);
+    const labelTop = startLabel.node().getBBox().y;
+    const shift = Math.max(0, headBottom + H.minGapPx / scale - labelTop);
+    gScene.attr("transform", shift ? `translate(0,${shift.toFixed(1)})` : null);
+    // fondo della legenda, sempre per tre righe (più la riga sull'arrotondamento quando sta
+    // sotto), anche quando ce ne sono meno (24 giugno nessuna): l'altezza della scena non cambia
+    // da un giorno all'altro (+0,7 em per le discendenti: Martel Sans ha molto spazio sotto le
+    // lettere). Con la riga accanto è lo stesso spazio della V10. placeLegend() viene prima.
+    const fs = px(S.text.carpetSub), ns = roundingNoteSize(scale);
+    const legendH = fs * (1.25 + 2 * CP.legend.rowStep) +
+      (roundingBeside ? fs * 0.7 : ns * (CP.roundingNote.gapEm + 0.7));
+    const bottom = G.y + CP.bracketGap + legendH;
+    const height = Math.max(S.height, Math.ceil(bottom + shift + 2));
+    svg.attr("viewBox", `0 0 ${S.width} ${height}`);
+    return shift;
+  }
+
+  // manda a capo un testo dentro maxWidth; restituisce il numero di righe.
+  // "str" può essere un elenco: ogni elemento comincia su una riga nuova
+  // (e va a capo da solo se è più largo di maxWidth)
+  function wrapText(textSel, str, lineHeightEm, maxWidth = H.maxWidth, x = H.x) {
+    textSel.selectAll("tspan").remove();
+    const parts = (Array.isArray(str) ? str : [str]).filter(Boolean);
+    let lines = 0;
+    parts.forEach(part => {
+      let line = [];
+      let tspan = textSel.append("tspan").attr("x", x).attr("dy", lines ? `${lineHeightEm}em` : 0);
+      lines++;
+      part.split(" ").forEach(w => {
+        line.push(w);
+        tspan.text(line.join(" "));
+        if (tspan.node().getComputedTextLength() > maxWidth && line.length > 1) {
+          line.pop();
+          tspan.text(line.join(" "));
+          line = [w];
+          lines++;
+          tspan = textSel.append("tspan").attr("x", x).attr("dy", `${lineHeightEm}em`).text(w);
+        }
+      });
+    });
+    return lines;
+  }
+
+  // --- capitoli: un pulsante per ogni nota (giorno ed etichetta dal campo "from") ---
+  // Al clic la stessa cosa del cursore (showStatic): pausa, foglie in volo annullate, stato
+  // del giorno con la sua nota. Invio e spazio sono il clic nativo del pulsante, quindi
+  // attivano il capitolo e non play/pausa (che ascolta solo su #play e sul cursore).
+  const chapters = S.notes.map(n => byDate.get(n.from)).filter(Boolean)
+    .map(d => ({ giorno: d.giorno, label: fmtDay(parseDate(d.data)) }));
+  const chapterButtons = d3.select("#chapters .chapters-list").selectAll("button")
+    .data(chapters)
+    .join("button")
+    .attr("type", "button")
+    .attr("data-label", c => c.label)        // per la larghezza riservata al grassetto (CSS)
+    .attr("aria-label", c => S.chapters.ariaPrefix + c.label)
+    .text(c => c.label)
+    .on("click", (event, c) => showStatic(c.giorno));
+  // capitolo in corso: l'ultimo raggiunto (giorno corrente ≥ giorno del capitolo)
+  function updateChapters(giorno) {
+    const current = d3.max(chapters.filter(c => c.giorno <= giorno), c => c.giorno);
+    chapterButtons.attr("aria-current", c => (c.giorno === current ? "true" : null));
+  }
+
+  // --- cursore del tempo: un passo per ogni riga di fiore_giornaliero (colonna "giorno") ---
+  const byGiorno = new Map(fiore.map(d => [d.giorno, d]));
+  const slider = d3.select("#day")
+    .attr("min", d3.min(fiore, d => d.giorno))
+    .attr("max", d3.max(fiore, d => d.giorno))
+    .on("input", event => {
+      // trascinare il cursore mette in pausa e mostra lo stato del giorno, senza animazioni
+      const d = byGiorno.get(+event.target.value);
+      if (d) showStatic(d.giorno);
+    });
+  const sliderLabel = d3.select("#day-label");
+  d3.select("#timeline").property("hidden", !S.showSlider);
+  d3.select("#chapters").property("hidden", !S.showChapters);
+
+  // cursore (C3): punta di freccia alla fine del tratto percorso, rivolta in senso orario.
+  // La base sta sulla fine del tratto, la punta va avanti lungo l'anello. "angle" è quello del
+  // giorno (render) o, durante la riproduzione, un angolo tra due giorni (moveRingTo)
+  function placeCursor(angle) {
+    const a = rad(angle);
+    const [px, py] = polar(angle, R.radius);
+    const tx = Math.cos(a), ty = Math.sin(a);        // direzione oraria (tangente)
+    const nx = Math.sin(a), ny = -Math.cos(a);       // verso l'esterno (radiale)
+    const { length: cl, width: cw } = R.cursor;
+    cursor.attr("d", `M${px + tx * cl},${py + ty * cl} ` +
+      `L${px + nx * cw / 2},${py + ny * cw / 2} L${px - nx * cw / 2},${py - ny * cw / 2} Z`)
+      .attr("data-angle", angle);
+  }
+
+  // durante la riproduzione (design-spec §3, 27 ottobre): freccia e tratto colorato avanzano
+  // senza scatti oltre la posizione del giorno mostrato, fino ad "angle" (al massimo quella del
+  // giorno dopo). Il pezzo in più ha il colore del giorno mostrato, quindi anche i confini dei
+  // colori avanzano con la freccia. Il prossimo render() lo toglie; angle = null lo toglie subito.
+  function moveRingTo(angle) {
+    const day = byGiorno.get(currentGiorno);
+    gRingDone.select(".ring-partial").remove();
+    if (angle === null || angle <= day.angolo_gradi) { placeCursor(day.angolo_gradi); return; }
+    gRingDone.append("path").attr("class", "ring-partial")
+      .attr("d", arcPath(day.angolo_gradi, angle, R.radius))
+      .attr("fill", "none")
+      .attr("stroke", C[day.colore_foglia])
+      .attr("stroke-width", R.thickness);
+    placeCursor(angle);
+  }
+
+  // =================================================================
+  // Disegno di un fotogramma
+  // =================================================================
+  function render(date) {
+    const day = byDate.get(date);
+    if (!day) { showError(`No data for ${date}`); return; }
+    const selIndex = fiore.indexOf(day);
+    currentGiorno = day.giorno;
+    currentDate = date;
+
+    // capitolo in corso: segue il giorno mostrato (riproduzione, cursore, frecce, ?day=)
+    updateChapters(day.giorno);
+    // il cursore segue sempre il giorno mostrato (anche quando si usa un capitolo)
+    slider.property("value", day.giorno)
+      .attr("aria-valuetext", fmtDate(parseDate(date)));
+    sliderLabel.text(fmtShort(parseDate(date)));
+
+    // intestazione
+    dateText.text(fmtDate(parseDate(date)));
+    menNum.text(fmtNum(day.totale));
+    // km del gruppo principale: distanza in linea retta tra le tappe, quindi stima per difetto ("≈").
+    // Il primo giorno la distanza è esattamente 0: niente "≈" e niente "main army".
+    kmNum.text(null);
+    if (day.km_percorsi === 0) {
+      kmNum.text("0");
+      kmSub.text("");   // il 24 giugno niente "main army" (la riga resta riservata)
+    } else {
+      kmNum.append("tspan").attr("class", "muted").attr("font-weight", 300).text("≈ ");
+      kmNum.append("tspan").text(fmtNum(day.km_percorsi));
+      kmSub.text(L.kmSub);
+    }
+
+    // anello percorso fino alla data (inizio del giorno scelto): tratti consecutivi con lo
+    // stesso colore, pieni anche durante la sosta a Mosca (M3: la sosta la dice la parentesi)
+    gRingDone.selectAll("*").remove();
+    const runs = [];
+    for (let i = 0; i < selIndex; i++) {
+      const d = fiore[i];
+      const last = runs[runs.length - 1];
+      if (last && last.color === d.colore_foglia) {
+        last.end = fiore[i + 1].angolo_gradi;
+      } else {
+        runs.push({ color: d.colore_foglia, start: d.angolo_gradi, end: fiore[i + 1].angolo_gradi });
+      }
+    }
+    runs.forEach(run => {
+      gRingDone.append("path")
+        .attr("d", arcPath(run.start, run.end, R.radius))
+        .attr("fill", "none")
+        .attr("stroke", C[run.color])
+        .attr("stroke-width", R.thickness);
+    });
+    placeCursor(day.angolo_gradi);
+    cursor.raise();
+
+    // segni sull'anello: nascosti prima del loro giorno, muted nel loro periodo, poi traccia
+    ringMarks.forEach(m => {
+      const shown = day.giorno >= m.from, trace = day.giorno > m.until;
+      m.text.attr("display", shown ? null : "none").style("fill", trace ? C.markTrace : null);
+      if (m.tick) m.tick.attr("display", shown ? null : "none").attr("stroke", trace ? C.markTrace : C.ink);
+    });
+    drawMoscowBracket(day);
+
+    // nota del momento in corso (al massimo una; impaginata in applyTextSizes)
+    currentNote = S.notes.find(n => n.from <= date && date <= n.to) ?? null;
+    noteText.attr("data-note", currentNote ? currentNote.id : null);
+
+    // rami: i laterali diventano traccia dal giorno della loro migrazione in poi
+    // (nell'animazione solo dopo che le foglie sono volate via: branchHold)
+    const isTrace = b => day.giorno >= traceFrom[b.ramo] && !branchHold.has(b.ramo);
+    branchLines
+      .attr("data-trace", b => String(isTrace(b)))
+      .attr("stroke", b => isTrace(b) ? C.branchTrace : C.ink);
+
+    // chioma: su ogni ramo le prime N posizioni (N dal CSV), tutte del colore del giorno.
+    // "key" = ramo:posto, per ritrovare la foglia quando una foglia in volo la raggiunge
+    gCrown.selectAll("*").remove();
+    crownNodes.clear();
+    const leafAt = (s, cls, key) => {
+      const g = gCrown.append("g")
+        .attr("class", cls)
+        .attr("data-ramo", s.ramo)
+        .attr("transform", `translate(${s.x},${s.y}) rotate(${s.angle})`);
+      drawLeaf(g, day.colore_foglia, cls === "half-leaf");
+      if (key) {
+        crownNodes.set(key, g.node());
+        if (hiddenSlots.has(key)) g.attr("opacity", 0);
+      }
+    };
+    Object.entries(S.branchData).forEach(([ramo, b]) => {
+      slots[ramo].slice(0, day[b.column]).forEach((s, i) => leafAt(s, "leaf", `${ramo}:${i}`));
+    });
+    // mezza foglia: nel primo posto libero della guida, lo stesso in cui il 14 dicembre
+    // compare la foglia intera (servirà all'animazione della ricomposizione)
+    if (day.mezza_foglia_guida) leafAt(slots.guida[day.foglie_guida], "half-leaf");
+
+    // tappeto: solo le foglie cadute fino alla data scelta, ognuna nel suo posto fisso,
+    // con il colore che aveva quando è caduta (colonna colore_foglia di petali_caduti.csv)
+    gFallen.selectAll("*").remove();
+    fallenNodes.clear();
+    const fallen = order.filter(c => c.giorno <= day.giorno);
+    fallen.forEach(leaf => {
+      const p = carpetPos.get(leaf.petalo);
+      const g = gFallen.append("g")
+        .attr("class", "fallen-leaf")
+        .attr("data-petalo", leaf.petalo)
+        .attr("data-colore", leaf.colore_foglia)
+        .attr("transform", `translate(${p.x},${p.y}) rotate(${p.rot}) translate(${-LL / 2},0)`);
+      drawLeaf(g, leaf.colore_foglia);
+      g.append("title").text(
+        `Leaf ${leaf.petalo} · fell on ${fmtShort(parseDate(leaf.data))}` +
+        (isEstimated(leaf.data) ? " (estimated date)" : ""));
+      fallenNodes.set(leaf.petalo, g.node());
+      if (hiddenPetals.has(leaf.petalo)) g.attr("opacity", 0);   // la sua foglia è ancora in volo
+    });
+
+    drawCarpetLabels(day);
+    applyTextSizes();
+  }
+
+  // tratti del tappeto: parentesi sotto ogni tratto con almeno una foglia, e riga della legenda.
+  // Il confine tra due tratti è a metà tra l'ultima foglia di uno e la prima dell'altro.
+  // Durante l'animazione (design-spec §3, 27 ottobre e precisazione dopo la V12):
+  // - la parentesi conta le foglie già atterrate, una per una (non quelle ancora in volo,
+  //   hiddenPetals);
+  // - la riga della legenda (foglie e uomini insieme) mostra l'ultimo giorno concluso, cioè il
+  //   giorno prima della prima foglia ancora in volo: si aggiorna, o compare, solo quando atterra
+  //   l'ultima foglia di un giorno. Così foglie e uomini sono sempre una coppia della V10.
+  // Senza foglie in volo (cursore, ?day=) è lo stato della V10. Richiamata da render() e a ogni
+  // atterraggio.
+  function drawCarpetLabels(day) {
+    gBrackets.selectAll("*").remove();
+    const landed = order.filter(c => c.giorno <= day.giorno && !hiddenPetals.has(c.petalo));
+    const isLanded = c => c && c.giorno <= day.giorno && !hiddenPetals.has(c.petalo);
+    const waiting = order.filter(c => hiddenPetals.has(c.petalo));
+    const legendDay = waiting.length ? byGiorno.get(d3.min(waiting, c => c.giorno) - 1) : day;
+    const lost = menLostByColor(fiore.indexOf(legendDay));
+    const legendColor = d3.group(order.filter(c => c.giorno <= legendDay.giorno), c => c.colore_foglia);
+    seasons.forEach(k => {
+      const leaves = legendColor.get(k) ?? [];
+      legendRows[k].visible = leaves.length > 0;
+      if (!legendRows[k].visible) return;
+      const leavesText = `${leaves.length} ${leaves.length === 1 ? "leaf" : "leaves"}`;
+      const menText = `${fmtNum(lost[k])} men`;
+      legendRows[k].name.text(S.seasonNames[k]);
+      legendRows[k].rest.text(` · ${leavesText} · ${menText}`);
+    });
+    const byColor = d3.group(landed, c => c.colore_foglia);
+    seasons.forEach(k => {
+      const leaves = byColor.get(k) ?? [];
+      if (!leaves.length) return;
+      const first = carpetPos.get(leaves[0].petalo), last = carpetPos.get(leaves[leaves.length - 1].petalo);
+      const prev = order[first.i - 1], next = order[last.i + 1];
+      const x0 = prev ? (carpetPos.get(prev.petalo).x + first.x) / 2 : G.left;
+      const x1 = isLanded(next)
+        ? (carpetPos.get(next.petalo).x + last.x) / 2
+        : Math.min(G.right, last.x + LL / 2);
+      const yb = G.y + CP.bracketGap, tick = CP.bracketTick;
+      gBrackets.append("path")
+        .attr("class", "carpet-bracket")
+        .attr("data-season", k)
+        .attr("d", `M${x0 + 2},${yb - tick} V${yb} H${x1 - 2} V${yb - tick}`)
+        .attr("fill", "none").attr("stroke", C.inkMuted).attr("stroke-width", 1);
+    });
+  }
+
+  // =================================================================
+  // Animazione (design-spec §3 e §5)
+  // =================================================================
+  // Un solo orologio "virtuale" (clock, in ms) muove tutto: giorni, foglie, note. Avanza
+  // solo durante la riproduzione, quindi la pausa ferma anche una foglia a metà caduta.
+  // Lo stato di ogni giorno lo disegna sempre render(), come nella V10; l'animazione aggiunge
+  // solo copie temporanee delle foglie in gAnim e, finché volano, tiene nascoste le foglie
+  // vere che le aspettano (hiddenPetals, hiddenSlots, branchHold). Quando atterrano, la copia
+  // sparisce e la foglia vera ricompare nello stesso punto: la scena finale è quella statica.
+  const A = S.animation;
+  const reduced = { on: window.matchMedia("(prefers-reduced-motion: reduce)").matches };
+  const firstGiorno = fiore[0].giorno, lastGiorno = fiore[fiore.length - 1].giorno;
+  const noteByGiorno = new Map(S.notes.map(n => [byDate.get(n.from)?.giorno, n]));
+  const isNoteDay = g => noteByGiorno.has(g);
+  const words = n => n.text.join(" ").split(/\s+/).filter(Boolean).length;
+  const holdMs = n => Math.max(A.note.minMs, A.note.baseMs + A.note.perWordMs * words(n));
+  // durata del passo che porta al giorno g: rallenta negli ultimi due giorni prima di una nota
+  const stepMs = g => A.dayMs * (isNoteDay(g) ? A.slowdown[1] : isNoteDay(g + 1) ? A.slowdown[0] : 1);
+
+  let clock = 0, seq = 0;
+  let playing = false;   // l'orologio avanza
+  let chain = false;     // c'è una riproduzione in corso (anche se in pausa)
+  let ended = false;     // arrivata al 14 dicembre: il pulsante diventa Replay
+  let manual = false;    // solo per i test: l'orologio avanza solo con minardPlayer.tick()
+  let events = [];       // azioni programmate: { time, n, fn }
+  let tweens = [];       // animazioni in corso: { kind: "leaf" | "note", start, dur, update, end }
+
+  // esegue fn tra "delay" ms dell'orologio
+  function at(delay, fn) {
+    events.push({ time: clock + Math.max(0, delay), n: seq++, fn });
+    events.sort((a, b) => a.time - b.time || a.n - b.n);
+  }
+  // animazione da t = 0 a t = 1 in "dur" ms, che parte tra "delay" ms
+  function tween(kind, delay, dur, update, end) {
+    const tw = { kind, start: clock + delay, dur, update, end };
+    tweens.push(tw);
+    update(0);
+    return tw;
+  }
+  function updateTweens() {
+    const done = [];
+    tweens.forEach(tw => {
+      const t = clock < tw.start ? 0 : tw.dur > 0 ? Math.min(1, (clock - tw.start) / tw.dur) : 1;
+      tw.update(t);
+      if (clock >= tw.start + tw.dur) done.push(tw);
+    });
+    if (!done.length) return;
+    tweens = tweens.filter(tw => !done.includes(tw));
+    done.forEach(tw => tw.end && tw.end());
+  }
+  // fa avanzare l'orologio di dt ms, eseguendo in ordine le azioni che cadono nel mezzo
+  function advance(dt) {
+    const target = clock + dt;
+    while (playing && events.length && events[0].time <= target) {
+      const e = events.shift();
+      clock = e.time;
+      updateTweens();
+      e.fn();
+    }
+    if (playing) clock = target;
+    updateTweens();
+    if (playing) updateRing();   // freccia e anello senza scatti tra un giorno e l'altro
+  }
+  // fine dell'ultima animazione delle foglie in corso (la nota aspetta che siano tutte a terra)
+  const leafEnd = () => d3.max(tweens.filter(t => t.kind === "leaf"), t => t.start + t.dur) ?? clock;
+
+  // --- geometria delle foglie in volo (coordinate di gScene) ---
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const turn = (a0, a1) => a0 + ((((a1 - a0) % 360) + 540) % 360 - 180);   // rotazione più breve
+  const leafTransform = (x, y, angle) => `translate(${x},${y}) rotate(${angle})`;
+  const slotPose = s => ({ x: s.x + currentShiftX, y: s.y, angle: s.angle });
+  // sul tappeto la foglia è centrata: la base sta mezza foglia indietro lungo la sua direzione
+  const carpetPose = petalo => {
+    const p = carpetPos.get(petalo), a = rad(p.rot);
+    return { x: p.x - Math.cos(a) * LL / 2, y: p.y - Math.sin(a) * LL / 2, angle: p.rot };
+  };
+  // legenda e parentesi del tappeto dopo un atterraggio (senza ridisegnare tutta la scena)
+  function refreshCarpetLabels() {
+    drawCarpetLabels(byGiorno.get(currentGiorno));
+    const scale = svg.node().getBoundingClientRect().width / S.width;
+    if (scale) placeLegend(scale);
+  }
+  function cloneLeaf(pose, colorKey, half = false) {
+    const g = gAnim.append("g").attr("class", "flying-leaf")
+      .attr("transform", leafTransform(pose.x, pose.y, pose.angle));
+    drawLeaf(g, colorKey, half);
+    return g;
+  }
+
+  // caduta: si stacca, scende con un dondolio leggero e si posa nel suo posto del tappeto
+  function fallTween(g, a, b, delay, end) {
+    const F = A.fall, bAngle = turn(a.angle, b.angle);
+    tween("leaf", delay, F.ms, t => {
+      const e = d3.easeSinInOut(t);
+      const wave = Math.sin(2 * Math.PI * F.swings * t) * Math.sin(Math.PI * t);   // 0 alla partenza e all'arrivo
+      g.attr("transform", leafTransform(
+        lerp(a.x, b.x, e) + F.sway * wave,
+        lerp(a.y, b.y, d3.easeQuadInOut(t)),
+        lerp(a.angle, bAngle, e) + F.spin * wave));
+    }, end);
+  }
+  // volo ad arco (migrazione e ricomposizione): curva di Bézier sollevata di "lift"
+  function arcTween(g, a, b, delay, ms, lift, end) {
+    const c = { x: (a.x + b.x) / 2, y: Math.min(a.y, b.y) - lift }, bAngle = turn(a.angle, b.angle);
+    tween("leaf", delay, ms, t => {
+      const e = d3.easeCubicInOut(t), u = 1 - e;
+      g.attr("transform", leafTransform(
+        u * u * a.x + 2 * u * e * c.x + e * e * b.x,
+        u * u * a.y + 2 * u * e * c.y + e * e * b.y,
+        lerp(a.angle, bAngle, e)));
+    }, end);
+  }
+  // prefers-reduced-motion: la foglia sparisce da dove era e compare dove va, in dissolvenza
+  function fadeSwap(g, getTarget, delay, end) {
+    tween("leaf", delay, A.reducedFadeMs, t => {
+      g.attr("opacity", 1 - t);
+      getTarget()?.setAttribute("opacity", t);
+    }, () => { g.remove(); end(); });
+  }
+
+  // cambio di colore della chioma (23 settembre: verde → marrone; 9 novembre: brina), una
+  // foglia alla volta, in ordine casuale ma fisso: dipende solo dal posto della foglia nella
+  // lista e dal seme (autumn.seed o frost.seed). Le foglie partono distribuite su "ms", così
+  // l'ultima finisce esattamente dopo "ms". nodes = la chioma più le copie che stanno per cadere.
+  function colourTween(nodes, from, to, ms) {
+    const fill = d3.interpolateRgb(C[from], C[to]);
+    const P = to === "gelo" ? A.frost : A.autumn;
+    const rank = nodes.map((n, i) => ({ n, r: seeded(i + 1, P.seed) })).sort((a, b) => a.r - b.r);
+    rank.forEach(({ n }, k) => {
+      const delay = rank.length > 1 ? k / (rank.length - 1) * (ms - P.leafMs) : 0;
+      const shape = n.querySelector("path.shape");
+      if (to !== "gelo") {
+        tween("leaf", delay, P.leafMs, t => shape.setAttribute("fill", fill(t)),
+          () => shape.setAttribute("fill", C[to]));
+        return;
+      }
+      // brina: nella prima metà colore, bordo interno e contorno; nella seconda i puntini
+      const edges = [...n.querySelectorAll("path:not(.shape)")], dots = [...n.querySelectorAll("circle")];
+      tween("leaf", delay, P.leafMs, t => {
+        const t1 = Math.min(1, t * 2), t2 = Math.max(0, t * 2 - 1);
+        shape.setAttribute("fill", fill(t1));
+        edges.forEach(p => p.setAttribute("opacity", t1));
+        dots.forEach(c => c.setAttribute("opacity", t2));
+      }, () => {
+        shape.setAttribute("fill", C[to]);
+        [...edges, ...dots].forEach(el => el.removeAttribute("opacity"));
+      });
+    });
+  }
+
+  // passaggio dal giorno prima a "day": disegna lo stato del giorno e anima quello che è
+  // cambiato. Ordine: prima il colore, poi le cadute, insieme alle eventuali migrazioni.
+  function animateDay(prev, day) {
+    const consecutive = prev && day.giorno === prev.giorno + 1;
+    const BD = S.branchData, guidaCol = BD.guida.column;
+
+    // foglie che cadono oggi, nell'ordine del tappeto (petali_caduti.csv). Il posto sul ramo
+    // è quello che la V10 toglie oggi: su ogni ramo restano le prime N posizioni, quindi cadono
+    // le ultime, a partire dalla più bassa ed esterna (l'ultima della lista)
+    const falls = consecutive ? order.filter(c => c.giorno === day.giorno) : [];
+    const fromSlot = new Map();
+    Object.keys(BD).forEach(ramo => {
+      falls.filter(c => c.ramo === ramo)
+        .forEach((c, k) => fromSlot.set(c.petalo, slots[ramo][prev[BD[ramo].column] - 1 - k]));
+    });
+
+    // migrazione: le foglie del ramo laterale volano sui primi posti liberi della guida
+    const mig = consecutive && day.migrazione_oggi
+      ? Object.keys(BD).find(r => BD[r].traceFrom === day.migrazione_oggi) : null;
+    const moves = [];
+    if (mig) {
+      for (let k = 0; k < prev[BD[mig].column]; k++) {
+        const i = prev[guidaCol] + k;
+        moves.push({ from: slots[mig][k], to: slots.guida[i], key: `guida:${i}` });
+      }
+    }
+
+    falls.forEach(c => hiddenPetals.add(c.petalo));
+    moves.forEach(m => hiddenSlots.add(m.key));
+    if (mig) branchHold.add(mig);
+    noteFade.all = isNoteDay(day.giorno) ? 0 : 1;      // la nota compare dopo gli eventi
+    noteFade.tail = day.giorno === lastGiorno ? 0 : 1;  // la nota finale ancora dopo
+    render(day.data);
+    if (!consecutive) return;
+
+    const colourChange = prev.colore_foglia !== day.colore_foglia;
+    const colourMs = colourChange && !reduced.on
+      ? (day.colore_foglia === "gelo" ? A.frost.ms : A.autumn.ms) : 0;
+    const clones = [];
+
+    // cadute (anche il 12 dicembre: la foglia intera cade e sul ramo resta la mezza foglia)
+    falls.forEach((c, k) => {
+      const g = cloneLeaf(slotPose(fromSlot.get(c.petalo)), c.colore_foglia);
+      clones.push(g.node());
+      const land = () => {
+        hiddenPetals.delete(c.petalo);
+        fallenNodes.get(c.petalo)?.removeAttribute("opacity");
+        refreshCarpetLabels();   // la parentesi conta la foglia ora; la legenda all'ultima del giorno
+      };
+      const delay = colourMs + k * A.fall.staggerMs;
+      if (reduced.on) fadeSwap(g, () => fallenNodes.get(c.petalo), delay, land);
+      else fallTween(g, slotPose(fromSlot.get(c.petalo)), carpetPose(c.petalo), delay, () => { g.remove(); land(); });
+    });
+
+    // migrazione del 26 novembre e ricomposizione del 14 dicembre (la foglia copre la mezza foglia)
+    if (mig) {
+      const half = prev.mezza_foglia_guida
+        ? cloneLeaf(slotPose(slots.guida[prev[guidaCol]]), prev.colore_foglia, true) : null;
+      const recompose = !!half;
+      const ms = recompose ? A.recompose.ms : A.migration.ms;
+      const lift = recompose ? A.recompose.arcLift : A.migration.arcLift;
+      let lastLanding = 0;
+      moves.forEach((m, k) => {
+        const g = cloneLeaf(slotPose(m.from), prev.colore_foglia);
+        const delay = k * A.migration.staggerMs;
+        lastLanding = Math.max(lastLanding, delay + (reduced.on ? A.reducedFadeMs : ms));
+        const land = () => {
+          hiddenSlots.delete(m.key);
+          crownNodes.get(m.key)?.removeAttribute("opacity");
+          if (half && !hiddenSlots.size) half.remove();   // coperta dalla foglia intera, senza dissolvenza
+        };
+        if (reduced.on) fadeSwap(g, () => crownNodes.get(m.key), delay, land);
+        else arcTween(g, slotPose(m.from), slotPose(m.to), delay, ms, lift, () => { g.remove(); land(); });
+      });
+      // il ramo spoglio diventa traccia dopo che tutte le foglie sono volate via
+      // (con prefers-reduced-motion il cambio di colore è immediato)
+      const lines = branchLines.filter(b => b.ramo === mig);
+      const traceFill = d3.interpolateRgb(C.ink, C.branchTrace);
+      tween("leaf", lastLanding, reduced.on ? 0 : A.branchTraceMs,
+        t => lines.attr("stroke", traceFill(t)),
+        () => {
+          branchHold.delete(mig);
+          lines.attr("data-trace", "true").attr("stroke", C.branchTrace);
+        });
+    }
+
+    // cambio di colore: chioma e foglie che stanno per cadere (le copie), insieme
+    if (colourChange && colourMs) {
+      colourTween([...gCrown.node().children, ...clones],
+        prev.colore_foglia, day.colore_foglia, colourMs);
+    }
+  }
+
+  // --- sequenza della riproduzione ---
+  // passo dal giorno g al giorno dopo, tra stepMs ms. Mentre il passo è in corso la freccia
+  // dell'anello avanza senza scatti (updateRing); nei giorni delle note, durante eventi, nota e
+  // pausa non c'è nessun passo in corso, quindi la freccia resta ferma sulla posizione del giorno.
+  // In pausa l'orologio è fermo, quindi updateRing() ridà sempre la stessa posizione
+  let pendingStep = null;   // { g, start, dur }
+  function scheduleStep(g) {
+    pendingStep = { g, start: clock, dur: stepMs(g + 1) };
+    at(pendingStep.dur, () => stepTo(g + 1));
+  }
+  function updateRing() {
+    const p = pendingStep;
+    if (!p || p.g !== currentGiorno) return;
+    const f = Math.min(1, Math.max(0, (clock - p.start) / p.dur));
+    moveRingTo(lerp(byGiorno.get(p.g).angolo_gradi, byGiorno.get(p.g + 1).angolo_gradi, f));
+  }
+
+  // arrivo al giorno g: eventi del giorno, poi (nei giorni delle note) nota, pausa, ripartenza
+  function stepTo(g) {
+    pendingStep = null;
+    const prev = byGiorno.get(currentGiorno);
+    animateDay(prev, byGiorno.get(g));
+    if (g === lastGiorno) { at(leafEnd() - clock + A.finale.afterMs, finale); return; }
+    const note = noteByGiorno.get(g);
+    if (!note) scheduleStep(g);
+    // "withEvent": la nota compare subito; resta almeno il tempo di lettura (da quando è
+    // comparsa) e comunque finché le animazioni del giorno non sono finite
+    else if (note.timing === "withEvent") {
+      fadeNote("all", 0, 1, () => holdAndGo(note, g, Math.max(holdMs(note), leafEnd() - clock)));
+    }
+    // "afterEvent": prima l'evento del giorno, poi la nota
+    else at(leafEnd() - clock, () => fadeNote("all", 0, 1, () => holdAndGo(note, g, holdMs(note))));
+  }
+  // la nota resta "hold" ms da quando è comparsa, poi sparisce e il tempo riparte
+  function holdAndGo(note, g, hold) {
+    at(hold, () => fadeNote("all", 1, 0, () => scheduleStep(g)));
+  }
+  function fadeNote(part, from, to, then) {
+    tween("note", 0, A.note.fadeMs, t => { noteFade[part] = lerp(from, to, t); applyNoteVisibility(); });
+    at(A.note.fadeMs, then);
+  }
+  // 14 dicembre: N7, poi dopo finalNoteMs la nota finale; poi la scena resta ferma
+  function finale() {
+    fadeNote("all", 0, 1, () => at(A.finale.finalNoteMs, () => fadeNote("tail", 0, 1, () => {
+      playing = false; chain = false; ended = true;
+      updateButton();
+    })));
+  }
+
+  // --- comandi ---
+  // annulla tutto e mostra lo stato statico del giorno (cursore, frecce, fine del video)
+  function stopAll() {
+    events = []; tweens = []; pendingStep = null;
+    gAnim.selectAll("*").remove();
+    hiddenPetals.clear(); hiddenSlots.clear(); branchHold.clear();
+    noteFade.all = 1; noteFade.tail = 1;
+    playing = false; chain = false; ended = false;
+  }
+  function showStatic(g) {
+    cancelAutoStart();
+    stopAll();
+    render(byGiorno.get(g).data);
+    updateButton();
+  }
+  // ridimensionamento o rotazione: le foglie in volo si annullano e si ridisegna il giorno
+  // (le note e il ritmo della riproduzione continuano)
+  function cancelLeafAnims() {
+    tweens = tweens.filter(t => t.kind !== "leaf");
+    gAnim.selectAll("*").remove();
+    hiddenPetals.clear(); hiddenSlots.clear(); branchHold.clear();
+    render(currentDate);
+    updateRing();   // freccia e anello di nuovo dove erano (anche in pausa: l'orologio è fermo)
+  }
+  function play(opts = {}) {
+    if (!opts.autostart) cancelAutoStart();
+    if (playing) return;
+    if (ended || (!chain && currentGiorno === lastGiorno)) { replay(); return; }
+    playing = true;
+    updateButton();
+    if (chain) return;   // riprende da dove si era fermata
+    chain = true;
+    const g = currentGiorno, note = noteByGiorno.get(g);
+    // partenza su un giorno con nota (già visibile): pausa di lettura, poi si parte.
+    // Con la partenza automatica la nota è già stata letta nei 4 s iniziali.
+    if (note) holdAndGo(note, g, opts.autostart ? 0 : holdMs(note));
+    else scheduleStep(g);
+  }
+  function replay() {
+    stopAll();
+    noteFade.all = 0;
+    render(fiore[0].data);
+    playing = true; chain = true;
+    updateButton();
+    const note = noteByGiorno.get(firstGiorno);
+    if (note) fadeNote("all", 0, 1, () => holdAndGo(note, firstGiorno, holdMs(note)));
+    else scheduleStep(firstGiorno);
+  }
+  // in pausa freccia e anello restano dove sono, anche a metà fra due giorni: l'orologio è fermo,
+  // e alla ripartenza continuano da lì (design-spec §3, correzione alla V14). Tornano sul giorno
+  // solo con il cursore, le frecce, ?day= e a fine corsa
+  function pause() { playing = false; updateButton(); }
+  function toggle() { if (playing) pause(); else play(); }
+
+  const playBtn = d3.select("#play").on("click", toggle);
+  function updateButton() {
+    const label = playing ? "Pause"
+      : ended || (!chain && currentGiorno === lastGiorno) ? "Replay" : "Play";
+    playBtn.text(label);
+  }
+
+  // tastiera, solo quando il focus è sui controlli (sul resto della pagina lo spazio la fa
+  // scorrere): spazio = play/pausa; frecce = un giorno indietro/avanti, in pausa.
+  // Sul cursore le frecce sono quelle del browser (spostano il cursore, che mette in pausa);
+  // sul pulsante lo spazio è il clic del browser.
+  playBtn.on("keydown", event => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const g = Math.max(firstGiorno, Math.min(lastGiorno, currentGiorno + (event.key === "ArrowRight" ? 1 : -1)));
+    showStatic(g);
+  });
+  slider.on("keydown", event => {
+    if (event.key !== " ") return;
+    event.preventDefault();
+    toggle();
+  });
+
+  // orologio: un passo per fotogramma, mai più lungo di maxFrameMs
+  let lastNow = null;
+  function frame(now) {
+    if (playing && !manual && lastNow !== null) advance(Math.min(now - lastNow, A.maxFrameMs));
+    lastNow = now;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  // pagina non visibile (altra scheda, finestra ridotta a icona): pausa; al ritorno riprende
+  let resumeOnShow = false;
+  document.addEventListener("visibilitychange", () => {
+    lastNow = null;
+    if (document.hidden && playing) { pause(); resumeOnShow = true; }
+    else if (!document.hidden && resumeOnShow) { resumeOnShow = false; play({ autostart: true }); }
+  });
+
+  // ricalcola i testi quando cambia la larghezza o quando il font è caricato.
+  // Se la larghezza cambia mentre delle foglie volano, le foglie in volo si annullano.
+  let lastWidth = null;
+  new ResizeObserver(() => {
+    const w = svg.node().getBoundingClientRect().width;
+    const changed = lastWidth !== null && w !== lastWidth;
+    lastWidth = w;
+    if (changed && (gAnim.node().childElementCount || tweens.some(t => t.kind === "leaf"))) cancelLeafAnims();
+    else applyTextSizes();
+  }).observe(svg.node());
+  if (document.fonts) document.fonts.ready.then(applyTextSizes);
+
+  // ?frame=0|1|2 nell'URL apre direttamente un fotogramma; ?day=0…173 un giorno qualsiasi
+  // (colonna "giorno"). Utili per gli screenshot: con questi la pagina non parte da sola.
+  // ?video=1: niente controlli, partenza automatica come nella pagina.
+  const params = new URLSearchParams(location.search);
+  const fromUrl = Number(params.get("frame"));
+  const dayFromUrl = byGiorno.get(Number(params.get("day") ?? NaN));
+  const start = S.frames[fromUrl] ? fromUrl : S.startFrame;
+  render(dayFromUrl ? dayFromUrl.data : S.frames[start].date);
+  updateButton();
+  if (params.get("video") === "1") document.body.classList.add("video");
+
+  // partenza automatica: 4 s dopo che la scena è entrata in vista, una sola volta.
+  // Niente con ?day= o ?frame=, né con prefers-reduced-motion. Toccare i controlli prima la annulla.
+  // "In vista": metà della scena visibile, oppure (scena più alta della finestra: telefono,
+  // portatile con finestra bassa) una parte visibile alta almeno metà della finestra. L'altezza
+  // è quella della finestra vera (rootBounds), anche quando la pagina è dentro un riquadro
+  // (iframe), dove window.innerHeight sarebbe l'altezza del riquadro.
+  let autoTimer = null, autoDone = params.has("day") || params.has("frame") || reduced.on;
+  const autoInfo = { ratio: null, visibleH: null, rootH: null };   // ultima misura (per i test)
+  function cancelAutoStart() { autoDone = true; clearTimeout(autoTimer); }
+  if (!autoDone) {
+    const io = new IntersectionObserver(entries => {
+      const e = entries[entries.length - 1];
+      const rootH = e.rootBounds?.height || window.innerHeight;
+      Object.assign(autoInfo, { ratio: e.intersectionRatio, visibleH: e.intersectionRect.height, rootH });
+      const visible = e.isIntersecting && (e.intersectionRatio >= A.autoStartVisible ||
+        e.intersectionRect.height >= A.autoStartVisible * rootH);
+      if (autoDone) { io.disconnect(); return; }
+      if (visible && !autoTimer) {
+        autoTimer = setTimeout(() => { io.disconnect(); if (!autoDone) { autoDone = true; play({ autostart: true }); } },
+          A.autoStartMs);
+      } else if (!visible && autoTimer) {
+        clearTimeout(autoTimer); autoTimer = null;   // uscita dalla vista prima dei 4 s: si ricomincia
+      }
+    }, { threshold: d3.range(0, 1.01, 0.1) });
+    io.observe(svg.node());
+  }
+  // controlli toccati prima della partenza automatica: niente partenza automatica
+  ["pointerdown", "keydown"].forEach(type =>
+    document.getElementById("timeline").addEventListener(type, cancelAutoStart));
+
+  // solo per i test (tests/animation.html): orologio guidato a mano
+  window.minardPlayer = {
+    play, pause, toggle,
+    setManual: v => { manual = v; },
+    setReducedMotion: v => { reduced.on = v; },
+    tick: ms => { if (playing) advance(ms); },
+    state: () => ({ giorno: currentGiorno, playing, chain, ended, note: noteFade.all, tail: noteFade.tail,
+      leafAnims: tweens.filter(t => t.kind === "leaf").length, flying: gAnim.node().childElementCount,
+      autostart: !autoDone, autoTimer: !!autoTimer, autoInfo: { ...autoInfo } }),
+  };
+}
+</script>
+</body>
+</html>

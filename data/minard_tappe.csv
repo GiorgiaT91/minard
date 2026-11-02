@@ -1,0 +1,52 @@
+rownames,gruppo,direzione,lon,lat,data,tipo_data,luogo,uomini,persi_da_tappa_prec,pct_persi_da_tappa_prec,stagione_astronomica,stagione_meteo,nota,fonte
+1,1,andata,24.0,54.9,1812-06-24,ancora_storica,Kowno (attraversamento del Niemen),340000,0,0.0,estate,estate,inizio dell'invasione,"napoleon-empire.org, campagna giorno per giorno"
+2,1,andata,24.5,55.0,1812-06-25,interpolata,,340000,0,0.0,estate,estate,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+3,1,andata,25.5,54.5,1812-06-28,ancora_storica,Wilna,340000,0,0.0,estate,estate,ingresso a Vilnius,"napoleon-empire.org, campagna giorno per giorno"
+4,1,andata,26.0,54.7,1812-07-01,interpolata,,320000,20000,5.9,estate,estate,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+5,1,andata,27.0,54.8,1812-07-07,interpolata,,300000,20000,6.2,estate,estate,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+6,1,andata,28.0,54.9,1812-07-13,interpolata,,280000,20000,6.7,estate,estate,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+7,1,andata,28.5,55.0,1812-07-16,interpolata,,240000,40000,14.3,estate,estate,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+8,1,andata,29.0,55.1,1812-07-19,interpolata,,210000,30000,12.5,estate,estate,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+9,1,andata,30.0,55.2,1812-07-25,interpolata,,180000,30000,14.3,estate,estate,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+10,1,andata,30.3,55.3,1812-07-28,ancora_storica,Witebsk,175000,5000,2.8,estate,estate,,"napoleon-empire.org, campagna giorno per giorno"
+11,1,andata,32.0,54.8,1812-08-17,ancora_storica,Smolensk,145000,30000,17.1,estate,estate,battaglia di Smolensk (16-18 ago),"Wikipedia, Battle of Smolensk (1812)"
+12,1,andata,33.2,54.9,1812-08-24,ancora_storica,Dorogobouge,140000,5000,3.4,estate,estate,,"napoleon-empire.org, campagna giorno per giorno (25–26 ago; si tiene il 24, decisione del 20 ott)"
+13,1,andata,34.4,55.5,1812-09-01,ancora_storica,Chjat (Gzhatsk),127100,12900,9.2,estate,autunno,,"napoleon-empire.org, campagna giorno per giorno"
+14,1,andata,35.5,55.4,1812-09-07,ancora_storica,Borodino (vicino Mojaisk),100000,27100,21.3,estate,autunno,battaglia di Borodino,"Wikipedia, Battle of Borodino"
+15,1,andata,36.0,55.5,1812-09-09,ancora_storica,Mojaisk,100000,0,0.0,estate,autunno,,"napoleon-empire.org, campagna giorno per giorno"
+16,1,andata,37.6,55.8,1812-09-14,ancora_storica,Moscou,100000,0,0.0,estate,autunno,ingresso a Mosca,"Wikipedia, French occupation of Moscow"
+17,1,ritorno,37.7,55.7,1812-10-19,ancora_storica,Moscou,100000,0,0.0,autunno,autunno,partenza da Mosca,"napoleon.org (Fondation Napoléon), cronologia della ritirata"
+18,1,ritorno,37.5,55.7,1812-10-19,interpolata,,98000,2000,2.0,autunno,autunno,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+19,1,ritorno,37.0,55.0,1812-10-23,interpolata,,97000,1000,1.0,autunno,autunno,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+20,1,ritorno,36.8,55.0,1812-10-24,ancora_storica,Malo-Jarosewii,96000,1000,1.0,autunno,autunno,battaglia di Malojaroslavets,"napoleon.org (Fondation Napoléon), cronologia della ritirata"
+21,1,ritorno,35.4,55.3,1812-10-29,ancora_storica,Mojaisk / Borodino,87000,9000,9.4,autunno,autunno,ripassaggio sul campo di Borodino,"napoleon-empire.org, campagna giorno per giorno"
+22,1,ritorno,34.3,55.2,1812-11-03,ancora_storica,Wixma,55000,32000,36.8,autunno,autunno,battaglia di Vjaz'ma,"napoleon.org (Fondation Napoléon), cronologia della ritirata"
+23,1,ritorno,33.3,54.8,1812-11-06,ancora_storica,Dorogobouge,37000,18000,32.7,autunno,autunno,,"napoleon-empire.org, campagna giorno per giorno (5 nov; si tiene il 6, decisione del 20 ott)"
+24,1,ritorno,32.0,54.6,1812-11-09,ancora_storica,Smolensk,24000,13000,35.1,autunno,autunno,arrivo a Smolensk,"napoleon-empire.org, campagna giorno per giorno"
+25,1,ritorno,30.4,54.4,1812-11-19,ancora_storica,Orscha,20000,4000,16.7,autunno,autunno,,"napoleon-empire.org, campagna giorno per giorno (napoleon.org: 20 nov)"
+26,1,ritorno,29.2,54.3,1812-11-23,ancora_storica,Bobr,20000,0,0.0,autunno,autunno,,"napoleon-empire.org, campagna giorno per giorno"
+27,1,ritorno,28.5,54.2,1812-11-26,ancora_storica,Studienska (Beresina),20000,0,0.0,autunno,autunno,inizio attraversamento della Beresina,"Wikipedia, Battle of Berezina"
+28,1,ritorno,28.3,54.3,1812-11-29,ancora_storica,Beresina,20000,0,0.0,autunno,autunno,fine attraversamento,"Wikipedia, Battle of Berezina"
+29,1,ritorno,27.5,54.5,1812-12-01,interpolata,,20000,0,0.0,autunno,inverno,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+30,1,ritorno,26.8,54.3,1812-12-03,ancora_storica,Moiodexno,12000,8000,40.0,autunno,inverno,,"napoleon-empire.org, campagna giorno per giorno"
+31,1,ritorno,26.4,54.4,1812-12-05,ancora_storica,Smorgoni,14000,-2000,-16.7,autunno,inverno,Napoleone lascia l'esercito,"napoleon-empire.org, campagna giorno per giorno"
+32,1,ritorno,25.0,54.4,1812-12-09,ancora_storica,Wilna,8000,6000,42.9,autunno,inverno,,"In Your Pocket, Napoleon in Lithuania (data non esatta)"
+33,1,ritorno,24.4,54.4,1812-12-12,interpolata,,4000,4000,50.0,autunno,inverno,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+34,1,ritorno,24.2,54.4,1812-12-13,interpolata,,4000,0,0.0,autunno,inverno,,interpolata in proporzione alla distanza tra le ancore (analisi.py)
+35,1,ritorno,24.1,54.4,1812-12-14,ancora_storica,Kowno,4000,0,0.0,autunno,inverno,ultimi superstiti ripassano il Niemen,"napoleon-empire.org, campagna giorno per giorno"
+36,2,andata,24.0,55.1,1812-06-24,ancora_storica,Kowno,60000,0,0.0,estate,estate,gruppo nord (corpo di Oudinot),"napoleon-empire.org, campagna giorno per giorno"
+37,2,andata,24.5,55.2,1812-06-28,stima_bassa_affidabilita,,60000,0,0.0,estate,estate,,"minardmap.org (data stimata dal sito, adottata il 20 ott 2026)"
+38,2,andata,25.5,54.7,1812-07-10,stima_bassa_affidabilita,,60000,0,0.0,estate,estate,,"minardmap.org (data stimata dal sito, adottata il 20 ott 2026)"
+39,2,andata,26.6,55.7,1812-07-29,stima_bassa_affidabilita,,40000,20000,33.3,estate,estate,,"minardmap.org (data stimata dal sito, adottata il 20 ott 2026)"
+40,2,andata,27.4,55.6,1812-08-05,stima_bassa_affidabilita,,33000,7000,17.5,estate,estate,,"minardmap.org (data stimata dal sito, adottata il 20 ott 2026)"
+41,2,andata,28.7,55.5,1812-08-17,stima_bassa_affidabilita,Polotzk,33000,0,0.0,estate,estate,prima battaglia di Polotsk (17-18 ago); il gruppo resta attorno a Polotsk fino a ottobre,"minardmap.org (data stimata dal sito, adottata il 20 ott 2026)"
+42,2,ritorno,28.7,55.5,1812-10-20,ancora_storica,Polotzk,33000,0,0.0,autunno,autunno,seconda battaglia di Polotsk (18-20 ott),"Wikipedia, Second Battle of Polotsk"
+43,2,ritorno,29.2,54.2,1812-11-23,stima_bassa_affidabilita,Bobr,30000,3000,9.1,autunno,autunno,,stima del progetto (bassa affidabilità)
+44,2,ritorno,28.5,54.1,1812-11-26,stima_bassa_affidabilita,Studienska,30000,0,0.0,autunno,autunno,si ricongiunge al gruppo principale,stima del progetto (bassa affidabilità)
+45,2,ritorno,28.3,54.2,1812-11-28,stima_bassa_affidabilita,Beresina,28000,2000,6.7,autunno,autunno,,stima del progetto (bassa affidabilità)
+46,3,andata,24.0,55.2,1812-06-24,ancora_storica,Kowno,22000,0,0.0,estate,estate,piccolo distaccamento a nord,"napoleon-empire.org, campagna giorno per giorno"
+47,3,andata,24.5,55.3,1812-07-24,stima_bassa_affidabilita,,22000,0,0.0,estate,estate,,"minardmap.org (data stimata dal sito, adottata il 20 ott 2026)"
+48,3,andata,24.6,55.8,1812-09-14,stima_bassa_affidabilita,,6000,16000,72.7,estate,autunno,il gruppo nord scende a 6.000,"minardmap.org (data stimata dal sito, adottata il 20 ott 2026)"
+49,3,ritorno,24.6,55.8,1812-10-19,stima_bassa_affidabilita,,6000,0,0.0,autunno,autunno,,"minardmap.org (data stimata dal sito, adottata il 20 ott 2026)"
+50,3,ritorno,24.2,54.4,1812-12-11,stima_bassa_affidabilita,,6000,0,0.0,autunno,inverno,,"minardmap.org (data stimata dal sito, adottata il 20 ott 2026)"
+51,3,ritorno,24.1,54.4,1812-12-14,stima_bassa_affidabilita,Kowno,6000,0,0.0,autunno,inverno,,stima del progetto (bassa affidabilità)
